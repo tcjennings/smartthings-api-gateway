@@ -1,0 +1,22 @@
+apiVersion: app/v1
+kind: Deployment
+metadata:
+  name: smartthings-api-gateway-deployment
+  labels:
+    app: smartthings-api-gateway
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: smartthings-api-gateway
+  template:
+    metadata:
+      labels:
+        app: smartthings-api-gateway
+    spec:
+      containers:
+      - name: smartthings-api-gateway
+        image: smartthings-api-gateway:1.0.0
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 3000

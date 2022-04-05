@@ -1,0 +1,79 @@
+const Config = require("./config");
+
+/**
+ * Returns a list of zones available in the controller stack.
+ *
+ * @return {object} An object with a list of zones and metadata.
+ */
+exports.ZoneDiscoveryHandler = (request, h) => {
+  const controllers = [];
+  const zones = [];
+  for (const controller of Config.config.controllers) {
+    controllers.push(`${controller.controller}`);
+    for (const zone of controller.zones) {
+      zones.push(`${controller.controller}${zone.zone}`);
+    }
+  }
+
+  return {
+    zones: zones,
+    metadata: {
+      controllers: controllers,
+    },
+  };
+};
+
+/**
+ * Returns the configured name for a specific zone
+ * @param {*} request
+ * @param {*} h
+ * @returns  {object} Object with the controller, zone, and name
+ */
+exports.ZoneNameDiscoveryHandler = (request, h) => {
+  const controller =
+    Config.config.controllers[parseInt(request.params.controller) - 1];
+
+  return {
+    controller: request.params.controller,
+    zone: request.params.zone,
+    name: controller.zones[parseInt(request.params.zone) - 1].name,
+    metadata: {
+      id: request.params.id,
+    },
+  };
+};
+
+exports.CapabilityCommand = (request, h) => {
+  // request.params will include controller, zone, and capability
+  return {
+    capability: request.params.capability,
+    attributes: {},
+    metadata: {
+      controller: request.params.controller,
+      zone: request.params.zone,
+    },
+  };
+};
+
+exports.SourceNamesDiscoveryHandler = (request, h) => {
+  const sources = [];
+  for (const i in Config.config.sources) {
+    sources.push({ id: i, name: Config.config.sources[i] });
+  }
+  return {
+    sources: sources,
+    metadata: {
+      id: request.params.id,
+    },
+  };
+};
+
+exports.SourceNameDiscoveryHandler = (request, h) => {
+  return {
+    source: request.params.source,
+    name: Config.config.sources[parseInt(request.params.source) - 1],
+    metadata: {
+      id: request.params.id,
+    },
+  };
+};

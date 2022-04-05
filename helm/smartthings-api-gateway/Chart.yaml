@@ -1,0 +1,18 @@
+apiVersion: v2
+name: smartthings-api-gateway
+version: "1.0.0"
+kubeVersion: ">= 1.19.0"
+description: Deploys the SmartThings API Gateway node application.
+type: application
+keywords:
+- smartthings
+sources:
+- https://github.com/tcjennings/smartthings-api-gateway
+dependencies: []
+maintainers:
+- name: Toby Jennings
+  email: tcjennings@hotmail.com
+  url: https://www.intranetofstuff.com
+appVersion: "1.0.0"
+deprecated: false
+annotations: {}

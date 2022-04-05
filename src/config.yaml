@@ -1,0 +1,29 @@
+smarthings:
+  plugins:
+    - monoprice
+monoprice:
+  sources:
+    - source_1_name
+    - source_2_name
+    - source_3_name
+    - source_4_name
+    - source_5_name
+    - source_6_name
+  controllers:
+    - controller: 1
+      zones:
+        - zone: 1
+          name: zone_1_name
+        - zone: 2
+          name: zone_2_name
+        - zone: 3
+          name: zone_3_name
+        - zone: 4
+          name: zone_4_name
+        - zone: 5
+          name: zone_5_name
+        - zone: 6
+          name: zone_6_name
+  serial:
+    device: /dev/usb0
+    speed: 9600
