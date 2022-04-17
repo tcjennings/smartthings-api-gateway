@@ -1,0 +1,7 @@
+name: smartthings-api-gateway
+image:
+  pullPolicy: Always
+  repository: ghcr.io/tcjennings
+  tag: main
+app:
+  port: 3000

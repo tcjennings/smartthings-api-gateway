@@ -8,6 +8,7 @@ keywords:
 - smartthings
 sources:
 - https://github.com/tcjennings/smartthings-api-gateway
+icon: https://cdnjs.cloudflare.com/ajax/libs/simple-icons/3.2.0/smartthings.svg
 dependencies: []
 maintainers:
 - name: Toby Jennings

@@ -1,0 +1,40 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "required": [
+    "image"
+  ],
+  "properties": {
+    "name": {
+        "type": "string"
+    },
+    "app": {
+        "type": "object",
+        "properties": {
+            "port": {
+              "type": "number"
+            }
+        }
+    },
+    "image": {
+      "type": "object",
+      "required": [
+        "repository",
+        "pullPolicy"
+      ],
+      "properties": {
+        "repository": {
+          "type": "string",
+          "pattern": "^[a-z0-9-_/.]+$"
+        },
+        "pullPolicy": {
+          "type": "string",
+          "pattern": "^(Always|Never|IfNotPresent)$"
+        },
+        "tag": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
