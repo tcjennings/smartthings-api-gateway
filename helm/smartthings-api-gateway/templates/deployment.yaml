@@ -1,4 +1,4 @@
-apiVersion: app/v1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ .Values.name }}-deployment
@@ -19,7 +19,11 @@ spec:
         image: {{ .Values.image.repository}}{{ if .Values.image.repository}}/{{ end }}{{ .Values.name }}:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         ports:
-        - containerPort: {{ .Values.app.port }}
+        - containerPort: 3000
+      {{- if .Values.image.secret }}
+      imagePullSecrets:
+      - name: {{ .Values.image.secret }}
+      {{- end }}
       volumes:
       - name: config
         configMap:

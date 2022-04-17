@@ -25,5 +25,5 @@ monoprice:
         - zone: 6
           name: zone_6_name
   serial:
-    device: /dev/usb0
+    device: /dev/ttyUSB0
     speed: 9600

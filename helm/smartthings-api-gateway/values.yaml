@@ -1,7 +1,14 @@
 name: smartthings-api-gateway
 image:
   pullPolicy: Always
-  repository: ghcr.io/tcjennings
+  # The repository in which the image may be found
+  repository: ghcr.io/USERNAME
   tag: main
+  # If the repository requires authentication, you must
+  # add the appropriate `docker-registry` secret to kubernetes
+  # and set the *name* of that secret here
+  # secret: regcred
 app:
-  port: 3000
+  # The nodeport for the service must be in the k8s nodePort range
+  # by default this is [30000,32767]
+  port: 30000

@@ -12,6 +12,7 @@
         "type": "object",
         "properties": {
             "port": {
+              "description": "The port number the k8s control plane should expose for the application (nodePort).",
               "type": "number"
             }
         }
@@ -32,6 +33,10 @@
           "pattern": "^(Always|Never|IfNotPresent)$"
         },
         "tag": {
+          "type": "string"
+        },
+        "secret": {
+          "description": "The name of a secret registered in your kuberenetes cluster, not the secret itself.",
           "type": "string"
         }
       }
