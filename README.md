@@ -20,6 +20,14 @@ A plugin should also include a discovery endpoint.
 
 The API server is available as a container image to be run in Docker, Kubernetes, etc.
 
+### Docker Images
+
+The API server is packaged as a Docker image supporting `amd64`, `arm64`, and `arm/v7`. This should allow the API server to run on Raspberry Pi 2/3/4 as well as most modern systems.
+
+### Helm Chart
+
+The API server can be deployed to a Kubernetes cluster, such as `k3s`, using the Chart in `./helm`. Update the `./helm/values.yaml` and `./helm/config.yaml` to match the configuration requirements of your environment.
+
 ### Configuration
 
 A configuration file, `config.yaml` is used to configure plugins. Plugins may define their own configuration layout and requirements.
