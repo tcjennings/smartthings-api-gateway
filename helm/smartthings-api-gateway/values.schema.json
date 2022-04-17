@@ -1,0 +1,45 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "required": [
+    "image"
+  ],
+  "properties": {
+    "name": {
+        "type": "string"
+    },
+    "app": {
+        "type": "object",
+        "properties": {
+            "port": {
+              "description": "The port number the k8s control plane should expose for the application (nodePort).",
+              "type": "number"
+            }
+        }
+    },
+    "image": {
+      "type": "object",
+      "required": [
+        "repository",
+        "pullPolicy"
+      ],
+      "properties": {
+        "repository": {
+          "type": "string",
+          "pattern": "^[a-z0-9-_/.]+$"
+        },
+        "pullPolicy": {
+          "type": "string",
+          "pattern": "^(Always|Never|IfNotPresent)$"
+        },
+        "tag": {
+          "type": "string"
+        },
+        "secret": {
+          "description": "The name of a secret registered in your kuberenetes cluster, not the secret itself.",
+          "type": "string"
+        }
+      }
+    }
+  }
+}

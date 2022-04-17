@@ -18,13 +18,34 @@ A plugin should also include a discovery endpoint.
 
 ## Deployment
 
-The API server is available as a container image to be run in Docker, Kubernetes, etc.
+The API server can be run directly from the repo and is available as a container image to be run in Docker, Kubernetes, etc.
+
+### Running From Repo
+
+Execute `npm run dev:serve` to run the server in the foreground with auto-reload for code changes.
+
+### Docker Images
+
+The API server is packaged as a Docker image supporting `amd64`, `arm64`, and `arm/v7`. This should allow the API server to run on Raspberry Pi 2/3/4 as well as most modern systems.
+
+### Docker Compose
+
+
+### Helm Chart
+
+The API server can be deployed to a Kubernetes cluster, such as `k3s`, using the Chart in `./helm`. Update the `./helm/values.yaml` and `./helm/config.yaml` to match the configuration requirements of your environment.
+
+Use `helm install stapig ./helm/smartthings-api-gateway` to deploy the Chart to your cluster.
 
 ### Configuration
 
-A configuration file, `config.yaml` is used to configure plugins. Plugins may define their own configuration layout and requirements.
+A configuration file, `config.yaml` is used to configure plugins. Plugins may define their own configuration layout and requirements. The `config.yaml` in the `./src` directory is used when directly running the server. Helm Charts load config from `./helm/config.yaml` and for other Docker deployments you should host-mount a `config.yaml` at the container location `/opt/app/config.yaml`.
 
 ### Github Actions
+
+The `.github` directory contains a GitHub Action that will build and deploy this application's container image to GitHub Container Registry. This action builds a multi-architecture image for the `amd64`, `arm64`, and `arm` platforms.
+
+If you fork this application, this action will target *your* GitHub Actions and Container Registry, which may incur fees for non-public repositories.
 
 ## Development
 

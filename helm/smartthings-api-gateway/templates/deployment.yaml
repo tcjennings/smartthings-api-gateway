@@ -1,22 +1,33 @@
-apiVersion: app/v1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: smartthings-api-gateway-deployment
+  name: {{ .Values.name }}-deployment
   labels:
-    app: smartthings-api-gateway
+    app: {{ .Values.name }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: smartthings-api-gateway
+      app: {{ .Values.name }}
   template:
     metadata:
       labels:
-        app: smartthings-api-gateway
+        app: {{ .Values.name }}
     spec:
       containers:
-      - name: smartthings-api-gateway
-        image: smartthings-api-gateway:1.0.0
-        imagePullPolicy: Never
+      - name: {{ .Values.name }}
+        image: {{ .Values.image.repository}}{{ if .Values.image.repository}}/{{ end }}{{ .Values.name }}:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
         ports:
         - containerPort: 3000
+      {{- if .Values.image.secret }}
+      imagePullSecrets:
+      - name: {{ .Values.image.secret }}
+      {{- end }}
+      volumes:
+      - name: config
+        configMap:
+          name: {{ .Values.name }}-configmap
+          items:
+          - key: config.yaml
+            path: config.yaml
