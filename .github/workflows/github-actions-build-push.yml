@@ -1,6 +1,8 @@
 name: GitHub Actions Build-Push Image
 on:
-  - push
+  push:
+    branches:
+      - main
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
@@ -21,7 +23,7 @@ jobs:
         uses: sigstore/cosign-installer@v2.2.1
 
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@@v1.2.0
+        uses: docker/setup-qemu-action@v1.2.0
         with:
           platforms: arm,arm64
 
