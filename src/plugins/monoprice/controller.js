@@ -19,6 +19,7 @@ exports.ZoneDiscoveryHandler = (request, h) => {
     zones: zones,
     metadata: {
       controllers: controllers,
+      id: request.query.id,
     },
   };
 };
@@ -38,7 +39,7 @@ exports.ZoneNameDiscoveryHandler = (request, h) => {
     zone: request.params.zone,
     name: controller.zones[parseInt(request.params.zone) - 1].name,
     metadata: {
-      id: request.params.id,
+      id: request.query.id,
     },
   };
 };
@@ -51,6 +52,7 @@ exports.CapabilityCommand = (request, h) => {
     metadata: {
       controller: request.params.controller,
       zone: request.params.zone,
+      id: request.query.id,
     },
   };
 };
@@ -63,7 +65,7 @@ exports.SourceNamesDiscoveryHandler = (request, h) => {
   return {
     sources: sources,
     metadata: {
-      id: request.params.id,
+      id: request.query.id,
     },
   };
 };
@@ -73,7 +75,7 @@ exports.SourceNameDiscoveryHandler = (request, h) => {
     source: request.params.source,
     name: Config.config.sources[parseInt(request.params.source) - 1],
     metadata: {
-      id: request.params.id,
+      id: request.query.id,
     },
   };
 };

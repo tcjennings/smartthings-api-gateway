@@ -17,9 +17,9 @@ const init = async (config) => {
   const swaggerOptions = {
     info: {
       title: "SmartThings API Server Documentation",
-      version: "1.0.0"
-    }
-  }
+      version: "1.0.0",
+    },
+  };
 
   // Register Swagger API documentation
   await server.register([
@@ -27,8 +27,8 @@ const init = async (config) => {
     Vision,
     {
       plugin: HapiSwagger,
-      options: swaggerOptions
-    }
+      options: swaggerOptions,
+    },
   ]);
 
   await server.register(SmartThings);
