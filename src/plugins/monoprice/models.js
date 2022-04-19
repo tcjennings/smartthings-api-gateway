@@ -69,3 +69,24 @@ exports.CapabilityCommandResponseModel = Joi.object({
     id: Joi.string(),
   }),
 });
+
+exports.CapabilityCallCommandRequestModel = {
+  params: Joi.object({
+    controller: Joi.string().required(),
+    zone: Joi.string().required(),
+  }),
+  payload: Joi.object({
+    hw: Joi.string()
+      .required()
+      .description("The hardware within the zone supporting the capability"),
+    capability: Joi.string()
+      .required()
+      .description("The SmartThings capability supporting the command"),
+    command: Joi.string()
+      .required()
+      .description("The command to execute on the capability"),
+    args: Joi.object().description("An object containing command arguments"),
+  }),
+};
+
+exports.CapabilityCallCommandResponseModel = Joi.object();

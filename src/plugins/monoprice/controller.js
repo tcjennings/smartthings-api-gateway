@@ -46,9 +46,11 @@ exports.ZoneNameDiscoveryHandler = (request, h) => {
 
 exports.CapabilityCommand = (request, h) => {
   // request.params will include controller, zone, and capability
+  let z = h.getZone(request.params.controller, request.params.zone);
+
   return {
     capability: request.params.capability,
-    attributes: {},
+    attributes: z.capabilities.PR.on(),
     metadata: {
       controller: request.params.controller,
       zone: request.params.zone,
@@ -78,4 +80,12 @@ exports.SourceNameDiscoveryHandler = (request, h) => {
       id: request.query.id,
     },
   };
+};
+
+exports.SourceNameUpdateHandler = (request, h) => {
+  return true;
+};
+
+exports.CapabilityCallCommand = (request, h) => {
+  return {};
 };

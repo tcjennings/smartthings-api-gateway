@@ -1,6 +1,6 @@
 {
   "name": "monoprice",
-  "version": "1.0.0",
-  "description": "Hapi plugin for Monoprice Amp functionality.",
+  "version": "0.1.0",
+  "description": "Hapi plugin for Monoprice Amp functionality",
   "main": "plugin.js"
 }

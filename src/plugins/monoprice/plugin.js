@@ -7,13 +7,41 @@ const Config = require("./config");
 const Controller = require("./controller");
 const Models = require("./models.js");
 const Validate = require("./validate");
+const Zone = require("./zone");
+const Package = require("./package.json");
 
 exports.plugin = {
-  pkg: require("./package.json"),
+  pkg: Package,
   register: async function (server, options) {
     Config.set_config(options);
     console.log(Config);
 
+    // set up all the Zone objects according to config
+    let zones = [];
+    for (let i in Config.config.controllers) {
+      for (let j in Config.config.controllers[i].zones) {
+        zones.push(
+          new Zone.Zone(
+            Config.config.controllers[i].controller,
+            Config.config.controllers[i].zones[j].zone
+          )
+        );
+      }
+    }
+    //console.log(zones)
+
+    // Plugin Methods
+    const getZone = (controller, zone) => {
+      const zoneId = `${controller}${zone}`;
+      for (let z in zones) {
+        if (zones[z].id === zoneId) {
+          return zones[z];
+        }
+      }
+    };
+    server.decorate("toolkit", "getZone", getZone);
+
+    // Plugin Routes
     server.route({
       method: "GET",
       path: "/monoprice/sources",
@@ -62,6 +90,16 @@ exports.plugin = {
     });
 
     server.route({
+      method: "PATCH",
+      path: "/monoprice/source/{source}/name",
+      handler: Controller.SourceNameUpdateHandler,
+      options: {
+        description: "Update the name of a specific source channel",
+        tags: ["api"],
+      },
+    });
+
+    server.route({
       method: "GET",
       path: "/monoprice/controller/{controller}/zone/{zone}/capability/{capability}",
       handler: Controller.CapabilityCommand,
@@ -70,6 +108,18 @@ exports.plugin = {
         tags: ["api"],
         validate: Models.CapabilityCommandRequestModel,
         response: { schema: Models.CapabilityCommandResponseModel },
+      },
+    });
+
+    server.route({
+      method: "POST",
+      path: "/monoprice/controller/{controller}/zone/{zone}",
+      handler: Controller.CapabilityCallCommand,
+      options: {
+        description: "Call a command for a capability at a specific zone",
+        tags: ["api"],
+        validate: Models.CapabilityCallCommandRequestModel,
+        response: { schema: Models.CapabilityCallCommandResponseModel },
       },
     });
   },
