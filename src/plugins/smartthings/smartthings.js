@@ -2,9 +2,10 @@
 
 const Capabilities = require("./capabilities");
 const Models = require("./models");
+const Package = require("./package.json");
 
 exports.plugin = {
-  pkg: require("./package.json"),
+  pkg: Package,
   register: async function (server, options) {
     server.route({
       method: "GET",

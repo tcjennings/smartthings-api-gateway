@@ -1,6 +1,6 @@
 {
   "name": "smarttthings",
-  "version": "1.0.0",
-  "description": "Hapi plugin for core smartthings functionality.",
+  "version": "0.1.0",
+  "description": "Hapi plugin for core smartthings functionality",
   "main": "smartthings.js"
 }
