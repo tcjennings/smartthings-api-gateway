@@ -15,6 +15,7 @@ A plugin should also include a discovery endpoint.
 
 - node
 - hapi
+  - joi
 
 ## Deployment
 
