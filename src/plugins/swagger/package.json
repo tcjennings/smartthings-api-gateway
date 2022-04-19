@@ -1,7 +1,6 @@
 {
-    "name": "app-swagger",
-    "version": "0.1.0",
-    "description": "SmartThings API Server Documentation",
-    "main": "plugin.js"
-  }
-  
+  "name": "app-swagger",
+  "version": "0.1.0",
+  "description": "SmartThings API Server Documentation",
+  "main": "plugin.js"
+}

@@ -7,7 +7,6 @@ const SmartThings = require("./plugins/smartthings");
 const Swagger = require("./plugins/swagger");
 
 exports.deployment = async ({ start, config } = {}) => {
-
   const server = Hapi.server({
     port: 3000,
     host: "0.0.0.0",
@@ -15,7 +14,7 @@ exports.deployment = async ({ start, config } = {}) => {
 
   await server.register(Swagger);
   await server.register(SmartThings);
-  
+
   // loop through configured plugins to load them?
   await server.register({ plugin: Monoprice, options: config.monoprice || {} });
 
@@ -30,9 +29,7 @@ exports.deployment = async ({ start, config } = {}) => {
   return server;
 };
 
-
 if (require.main === module) {
-
   const config = Config.LoadConfigs();
 
   exports.deployment({ start: true, config: config });
@@ -41,5 +38,4 @@ if (require.main === module) {
     console.log(err);
     throw err;
   });
-
 }
