@@ -36,7 +36,7 @@ The API server is packaged as a Docker image supporting `amd64`, `arm64`, and `a
 
 The API server can be deployed to a Kubernetes cluster, such as `k3s`, using the Chart in `./helm`. Update the `./helm/values.yaml` and `./helm/config.yaml` to match the configuration requirements of your environment.
 
-Use `helm install stapig ./helm/smartthings-api-gateway` to deploy the Chart to your cluster.
+Use `helm [install|upgrade] [-f values.local.yaml] stapig ./helm/smartthings-api-gateway` to deploy the Chart to your cluster.
 
 ### Configuration
 

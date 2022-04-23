@@ -26,7 +26,7 @@ spec:
         volumeMounts:
         {{- range .Values.app.devices }}
         - mountPath: {{ . }}
-          name: {{ . }}
+          name: d-{{ lower . | replace "/" "-" }}
         {{- end }}
         {{- end }}
       {{- if .Values.image.secret }}
@@ -42,7 +42,7 @@ spec:
             path: config.yaml
       {{- if .Values.app.devices }}
       {{- range .Values.app.devices }}
-      - name: {{ . }}
+      - name: d-{{ lower . | replace "/" "-" }}
         hostPath:
           path: {{ . }}
       {{- end }}
