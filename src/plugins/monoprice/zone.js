@@ -7,6 +7,10 @@
 
 // Additionally, a zone may support commands outside the scope of
 // any specific capability, such as STATUS
+const { RegexParser } = require("@serialport/parser-regex");
+
+const Regexes = require("./regexes")
+
 
 const Switch = class {
   // Constructor binds an instance of the Switch to a Zone
@@ -136,11 +140,14 @@ const remoteControlStatus = class {
 };
 
 exports.Zone = class {
-  constructor(controller, zone) {
+  constructor(controller, zone, port) {
     this.controller = controller;
     this.zone = zone;
     this.id = `${controller}${zone}`;
+    this.port = port;
     this.state = {
+      UNIT: null,
+      ZONE: null,
       PR: null,
       CH: null,
       VO: null,
@@ -162,5 +169,29 @@ exports.Zone = class {
       TR: new switchLevel(this, "TR"),
       BL: new switchLevel(this, "BL"),
     };
+    this.refreshState();
+    console.log(`Zone ${this.id} state: ${JSON.stringify(this.state)}`);
   }
-};
+
+  // Parses a zone status reponse string and update the state
+  // this is a callback so doesn't return anything
+  zoneStatusParser(data) {
+    const x = Regexes.reZoneStatus.exec(data)
+    for (const [k, v] of Object.entries(x.groups)) {
+      this.state[k] = v
+    }
+  }
+
+  // queries the serial port to refresh the state of the zone.
+  async refreshState() {
+    this.zone.port.open( async function (err) {
+      if (err) {
+        return console.log("Error opening port: ", err.message)
+      }
+      const parser = new RegexParser({regex: Regexes.reCommandResponseDelimiter });
+      this.zone.port.pipe(parser);
+      parser.on("data", zoneStatusParser);
+      await port.write(`?${this.id}\r`);
+    })
+  };  // end refreshState
+}; // end Zone

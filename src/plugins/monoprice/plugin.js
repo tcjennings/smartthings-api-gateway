@@ -1,6 +1,7 @@
 "use strict";
 
 const Joi = require("joi");
+const {SerialPort} = require("serialport");
 
 const Commands = require("./commands");
 const Config = require("./config");
@@ -16,6 +17,13 @@ exports.plugin = {
     Config.set_config(options);
     console.log(Config);
 
+    // create an instance of the serial port
+    const port = new SerialPort({
+      path: Config.config.serial.device,
+      baudRate: Config.config.serial.speed,
+      autoOpen: false,
+    });
+
     // set up all the Zone objects according to config
     let zones = [];
     for (let i in Config.config.controllers) {
@@ -23,7 +31,8 @@ exports.plugin = {
         zones.push(
           new Zone.Zone(
             Config.config.controllers[i].controller,
-            Config.config.controllers[i].zones[j].zone
+            Config.config.controllers[i].zones[j].zone,
+            port
           )
         );
       }
