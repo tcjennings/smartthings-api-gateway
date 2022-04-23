@@ -183,16 +183,16 @@ exports.Zone = class {
 
   // queries the serial port to refresh the state of the zone.
   async refreshState() {
-    this.zone.port.open(async function (err) {
+    this.port.open(async function (err) {
       if (err) {
         return console.log("Error opening port: ", err.message);
       }
       const parser = new RegexParser({
         regex: Regexes.reCommandResponseDelimiter,
       });
-      this.zone.port.pipe(parser);
+      this.port.pipe(parser);
       parser.on("data", zoneStatusParser);
-      await port.write(`?${this.id}\r`);
+      await this.port.write(`?${this.id}\r`);
     });
   } // end refreshState
 }; // end Zone
