@@ -20,6 +20,15 @@ spec:
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         ports:
         - containerPort: 3000
+        {{- if .Values.app.devices }}
+        securityContext:
+          privileged: true
+        volumeMounts:
+        {{- range .Values.app.devices }}
+        - mountPath: {{ . }}
+          name: {{ . }}
+        {{- end }}
+        {{- end }}
       {{- if .Values.image.secret }}
       imagePullSecrets:
       - name: {{ .Values.image.secret }}
@@ -31,3 +40,10 @@ spec:
           items:
           - key: config.yaml
             path: config.yaml
+      {{- if .Values.app.devices }}
+      {{- range .Values.app.devices }}
+      - name: {{ . }}
+        hostPath:
+          path: {{ . }}
+      {{- end }}
+      {{- end }}
