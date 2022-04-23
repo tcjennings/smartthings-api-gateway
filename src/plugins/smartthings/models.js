@@ -15,4 +15,4 @@ exports.CapabilitiesResponseModel = Joi.object({
   metadata: Joi.object({
     id: requestID,
   }),
-});
+}).label("CapabilitiesResponse");

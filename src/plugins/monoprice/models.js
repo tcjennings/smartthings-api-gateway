@@ -1,15 +1,18 @@
 const Joi = require("joi");
 
-const requestID = Joi.string().optional().description("a request ID");
+const requestID = Joi.string()
+  .optional()
+  .description("a request ID")
+  .label("RequestId");
 
 const responseMetadata = Joi.object({
   id: Joi.string(),
 });
 
-exports.DefaultRequestModel = {
+const DefaultRequestModel = {
   query: Joi.object({
     id: requestID,
-  }),
+  }).label("DefaultRequestQuery"),
 };
 
 exports.ZoneDiscoveryResponseModel = Joi.object({
@@ -17,7 +20,7 @@ exports.ZoneDiscoveryResponseModel = Joi.object({
   metadata: Joi.object({
     controllers: Joi.array().min(1).max(3).items(Joi.string()),
   }),
-});
+}).label("ZoneDiscoveryResponse");
 
 exports.ZoneNameDiscoveryRequestModel = {
   params: Joi.object({
@@ -34,20 +37,20 @@ exports.ZoneNameDiscoveryResponseModel = Joi.object({
   zone: Joi.string(),
   name: Joi.string(),
   metadata: responseMetadata,
-});
+}).label("ZoneNameDiscoveryResponse");
 
 exports.SourceNamesDiscoveryResponseModel = Joi.object({
   sources: Joi.array()
     .items(Joi.object({ id: Joi.number(), name: Joi.string() }))
     .length(6),
   metadata: responseMetadata,
-});
+}).label("SourceNamesDiscoveryResponse");
 
 exports.SourceNameDiscoveryResponseModel = Joi.object({
   source: Joi.string(),
   name: Joi.string(),
   metadata: responseMetadata,
-});
+}).label("SourceNameDisocveryResponse");
 
 exports.CapabilityCommandRequestModel = {
   params: Joi.object({
@@ -67,14 +70,14 @@ exports.CapabilityCommandResponseModel = Joi.object({
     controller: Joi.string(),
     zone: Joi.string(),
     id: Joi.string(),
-  }),
-});
+  }).label("ResponseMetadata"),
+}).label("CapabilityCommandResponse");
 
 exports.CapabilityCallCommandRequestModel = {
   params: Joi.object({
     controller: Joi.string().required(),
     zone: Joi.string().required(),
-  }),
+  }).label("CapabilityCallCommandRequestParams"),
   payload: Joi.object({
     hw: Joi.string()
       .required()
@@ -86,7 +89,9 @@ exports.CapabilityCallCommandRequestModel = {
       .required()
       .description("The command to execute on the capability"),
     args: Joi.object().description("An object containing command arguments"),
-  }),
+  }).label("CapabilityCallCommandRequestPayload"),
 };
 
-exports.CapabilityCallCommandResponseModel = Joi.object();
+exports.CapabilityCallCommandResponseModel = Joi.object().label(
+  "CapabilityCallCommandResponse"
+);
