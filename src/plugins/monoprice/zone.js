@@ -9,8 +9,7 @@
 // any specific capability, such as STATUS
 const { RegexParser } = require("@serialport/parser-regex");
 
-const Regexes = require("./regexes")
-
+const Regexes = require("./regexes");
 
 const Switch = class {
   // Constructor binds an instance of the Switch to a Zone
@@ -176,22 +175,24 @@ exports.Zone = class {
   // Parses a zone status reponse string and update the state
   // this is a callback so doesn't return anything
   zoneStatusParser(data) {
-    const x = Regexes.reZoneStatus.exec(data)
+    const x = Regexes.reZoneStatus.exec(data);
     for (const [k, v] of Object.entries(x.groups)) {
-      this.state[k] = v
+      this.state[k] = v;
     }
   }
 
   // queries the serial port to refresh the state of the zone.
   async refreshState() {
-    this.zone.port.open( async function (err) {
+    this.zone.port.open(async function (err) {
       if (err) {
-        return console.log("Error opening port: ", err.message)
+        return console.log("Error opening port: ", err.message);
       }
-      const parser = new RegexParser({regex: Regexes.reCommandResponseDelimiter });
+      const parser = new RegexParser({
+        regex: Regexes.reCommandResponseDelimiter,
+      });
       this.zone.port.pipe(parser);
       parser.on("data", zoneStatusParser);
       await port.write(`?${this.id}\r`);
-    })
-  };  // end refreshState
+    });
+  } // end refreshState
 }; // end Zone

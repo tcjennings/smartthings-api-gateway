@@ -1,7 +1,7 @@
 "use strict";
 
 const Joi = require("joi");
-const {SerialPort} = require("serialport");
+const { SerialPort } = require("serialport");
 
 const Commands = require("./commands");
 const Config = require("./config");
