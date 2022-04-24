@@ -171,7 +171,7 @@ exports.Zone = class {
       TR: new switchLevel(this, "TR"),
       BL: new switchLevel(this, "BL"),
     };
-    this.refreshState();
+    await this.refreshState();
     console.log(`Zone ${this.id} state: ${JSON.stringify(this.state)}`);
   }
 
@@ -185,7 +185,7 @@ exports.Zone = class {
       }
     }
     catch (e) {
-      console.log(e.message, data);
+      console.log(e.message, data, x);
     }
   }
 
