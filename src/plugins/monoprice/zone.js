@@ -178,9 +178,14 @@ exports.Zone = class {
   // Parses a zone status reponse string and update the state
   // this is a callback so doesn't return anything
   zoneStatusParser(data) {
-    const x = Regexes.reZoneStatus.exec(data);
-    for (const [k, v] of Object.entries(x.groups)) {
-      this.state[k] = v;
+    try {
+      const x = Regexes.reZoneStatus.exec(data);
+      for (const [k, v] of Object.entries(x.groups)) {
+        this.state[k] = v;
+      }
+    }
+    catch (e) {
+      console.log(e.message, data);
     }
   }
 

@@ -11,6 +11,25 @@ const Validate = require("./validate");
 const Zone = require("./zone");
 const Package = require("./package.json");
 
+function getPort() {
+  try {
+    const port =  new SerialPort({
+      path: Config.config.serial.device,
+      baudRate: Config.config.serial.speed,
+      autoOpen: false,
+    });
+    port.open(function (e) {
+      if (e) {
+        return console.log("Error opening port: ", e.message);
+      }
+    });
+    return port;
+  } catch (e) {
+    console.log(e);
+    return undefined;
+  }
+}
+
 exports.plugin = {
   pkg: Package,
   register: async function (server, options) {
@@ -19,11 +38,7 @@ exports.plugin = {
 
     // create an instance of the serial port
     // TODO serialport management should be a plugin that decorates the server
-    const port = new SerialPort({
-      path: Config.config.serial.device,
-      baudRate: Config.config.serial.speed,
-      autoOpen: true,
-    });
+    const port = await getPort();
 
     // set up all the Zone objects according to config
     let zones = [];
