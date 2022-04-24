@@ -31,3 +31,11 @@ You may stop and remove the deployment by uninstalling the chart.
 ```
 helm uninstall stapig
 ```
+
+## Monitor
+
+Best way to monitor the logs of a running deployment is to use [`stern`](https://kubernetes.io/blog/2016/10/tail-kubernetes-with-stern/).
+
+```
+stern smartthings-api-gateway
+```

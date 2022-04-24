@@ -180,12 +180,12 @@ exports.Zone = class {
   zoneStatusParser(data) {
     try {
       const x = Regexes.reZoneStatus.exec(data);
+      console.log("Parsing: ", data, x);
       for (const [k, v] of Object.entries(x.groups)) {
         this.state[k] = v;
       }
-    }
-    catch (e) {
-      console.log(e.message, data, x);
+    } catch (e) {
+      console.log("Failed updating status for message ", data, e.message);
     }
   }
 

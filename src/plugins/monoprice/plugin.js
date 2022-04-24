@@ -13,7 +13,7 @@ const Package = require("./package.json");
 
 function getPort() {
   try {
-    const port =  new SerialPort({
+    const port = new SerialPort({
       path: Config.config.serial.device,
       baudRate: Config.config.serial.speed,
       autoOpen: false,
