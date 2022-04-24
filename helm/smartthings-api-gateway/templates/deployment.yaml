@@ -13,6 +13,8 @@ spec:
     metadata:
       labels:
         app: {{ .Values.name }}
+      annotations:
+        rolling: {{ randAlphaNum 5 | quote }}
     spec:
       containers:
       - name: {{ .Values.name }}
