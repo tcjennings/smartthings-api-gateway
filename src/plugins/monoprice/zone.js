@@ -181,8 +181,12 @@ exports.Zone = class {
     try {
       const x = Regexes.reZoneStatus.exec(data);
       console.log("Parsing: ", data, x);
-      for (const [k, v] of Object.entries(x.groups)) {
-        this.state[k] = v;
+      // if a RESP group is matched...
+      if (groups.RESP) {
+        for (const [k, v] of Object.entries(x.groups)) {
+          // ... update all state values
+          this.state[k] = v;
+        }
       }
     } catch (e) {
       console.log("Failed updating status for message ", data, e.message);
@@ -192,7 +196,9 @@ exports.Zone = class {
   // queries the serial port to refresh the state of the zone.
   async refreshState() {
     this.port.pipe(this.parser);
-    this.parser.on("data", this.zoneStatusParser);
+    this.parser.on("data", (data) => {
+      this.zoneStatusParser(data);
+    });
     await this.port.write(`?${this.id}\r`);
   } // end refreshState
 }; // end Zone
