@@ -35,7 +35,7 @@ if (require.main === module) {
   exports.deployment({ start: true, config: config });
 
   process.on("unhandledRejection", (err) => {
-    console.log(err);
+    console.log("Unhandled Error", err);
     throw err;
   });
 }

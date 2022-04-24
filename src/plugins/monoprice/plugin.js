@@ -18,10 +18,11 @@ exports.plugin = {
     console.log(Config);
 
     // create an instance of the serial port
+    // TODO serialport management should be a plugin that decorates the server
     const port = new SerialPort({
       path: Config.config.serial.device,
       baudRate: Config.config.serial.speed,
-      autoOpen: false,
+      autoOpen: true,
     });
 
     // set up all the Zone objects according to config

@@ -144,6 +144,9 @@ exports.Zone = class {
     this.zone = zone;
     this.id = `${controller}${zone}`;
     this.port = port;
+    this.parser = new RegexParser({
+      regex: Regexes.reCommandResponseDelimiter,
+    });
     this.state = {
       UNIT: null,
       ZONE: null,
@@ -183,16 +186,8 @@ exports.Zone = class {
 
   // queries the serial port to refresh the state of the zone.
   async refreshState() {
-    this.port.open(async function (err) {
-      if (err) {
-        return console.log("Error opening port: ", err.message);
-      }
-      const parser = new RegexParser({
-        regex: Regexes.reCommandResponseDelimiter,
-      });
-      this.port.pipe(parser);
-      parser.on("data", zoneStatusParser);
-      await this.port.write(`?${this.id}\r`);
-    });
+    this.port.pipe(this.parser);
+    this.parser.on("data", this.zoneStatusParser);
+    await this.port.write(`?${this.id}\r`);
   } // end refreshState
 }; // end Zone
