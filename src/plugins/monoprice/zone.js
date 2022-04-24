@@ -182,7 +182,7 @@ exports.Zone = class {
       const x = Regexes.reZoneStatus.exec(data);
       console.log("Parsing: ", data, x);
       // if a RESP group is matched...
-      if (groups.RESP) {
+      if (x.groups.RESP) {
         for (const [k, v] of Object.entries(x.groups)) {
           // ... update all state values
           this.state[k] = v;

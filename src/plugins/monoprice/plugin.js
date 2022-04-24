@@ -17,6 +17,7 @@ function getPort() {
       path: Config.config.serial.device,
       baudRate: Config.config.serial.speed,
       autoOpen: false,
+      lock: false,
     });
     port.open(function (e) {
       if (e) {
