@@ -7,7 +7,7 @@
 
 // Additionally, a zone may support commands outside the scope of
 // any specific capability, such as STATUS
-const { RegexParser } = require("@serialport/parser-regex");
+const { ReadlineParser } = require("@serialport/parser-readline");
 
 const Regexes = require("./regexes");
 
@@ -144,9 +144,7 @@ exports.Zone = class {
     this.zone = zone;
     this.id = `${controller}${zone}`;
     this.port = port;
-    this.parser = new RegexParser({
-      regex: Regexes.reCommandResponseDelimiter,
-    });
+    this.parser = new ReadlineParser();
     this.state = {
       UNIT: null,
       ZONE: null,
@@ -179,7 +177,7 @@ exports.Zone = class {
   // this is a callback so doesn't return anything
   zoneStatusParser(data) {
     try {
-      const x = Regexes.reZoneStatus.exec(data);
+      const x = Regexes.reZoneStatus.exec(data.trim());
       console.log("Parsing: ", data, x);
       // if a RESP group is matched...
       if (x.groups.RESP) {
