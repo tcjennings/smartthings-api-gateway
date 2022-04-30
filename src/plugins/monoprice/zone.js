@@ -170,7 +170,6 @@ exports.Zone = class {
       BL: new switchLevel(this, "BL"),
     };
     this.refreshState();
-    console.log(`Zone ${this.id} state: ${JSON.stringify(this.state)}`);
   }
 
   // Parses a zone status reponse string and update the state
@@ -184,6 +183,7 @@ exports.Zone = class {
         for (const [k, v] of Object.entries(x.groups)) {
           // ... update all state values
           this.state[k] = v;
+          console.log(`Zone ${this.id} state: ${JSON.stringify(this.state)}`);
         }
       }
     } catch (e) {
@@ -198,5 +198,6 @@ exports.Zone = class {
       this.zoneStatusParser(data);
     });
     await this.port.write(`?${this.id}\r`);
+    return this.state;
   } // end refreshState
 }; // end Zone

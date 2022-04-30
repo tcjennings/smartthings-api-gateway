@@ -127,6 +127,18 @@ exports.plugin = {
 
     server.route({
       method: "GET",
+      path: "/monoprice/controller/{controller}/zone/{zone}",
+      handler: Controller.RefreshZoneCommand,
+      options: {
+        description: "Refresh and fetch state for a specific zone",
+        tags: ["api"],
+        // validate: Models.CapabilityCallCommandRequestModel,
+        // response: { schema: Models.CapabilityCallCommandResponseModel },
+      },
+    });
+
+    server.route({
+      method: "GET",
       path: "/monoprice/controller/{controller}/zone/{zone}/capability/{capability}",
       handler: Controller.CapabilityCommand,
       options: {

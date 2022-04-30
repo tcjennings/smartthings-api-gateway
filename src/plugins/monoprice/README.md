@@ -161,5 +161,5 @@ Single code inquiry
 Full zone inquiry
 
 ```
-^#>(?<UNIT>\d)(?<ZONE>\d)(?<PA>\d{2})(?<PR>\d{2})(?<MU>\d{2})(?<DT>\d{2})(?<VO>\d{2})(?<TR>\d{2})(?<BS>\d{2})(?<BL>\d{2})(?<CH>\d{2})(?<LS>\d{2})$
+/^#>(?<UNIT>\d)(?<ZONE>\d)(?<PA>\d{2})(?<PR>\d{2})(?<MU>\d{2})(?<DT>\d{2})(?<VO>\d{2})(?<TR>\d{2})(?<BS>\d{2})(?<BL>\d{2})(?<CH>\d{2})(?<LS>\d{2})\\r$/
 ```
