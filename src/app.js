@@ -8,7 +8,7 @@ const Swagger = require("./plugins/swagger");
 
 exports.deployment = async ({ start, config } = {}) => {
   const server = Hapi.server({
-    port: 3000,
+    port: parseInt(config.smartthings.port),
     host: "0.0.0.0",
   });
 
