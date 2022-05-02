@@ -138,6 +138,37 @@ const remoteControlStatus = class {
   }
 };
 
+// Parses a zone status reponse string and update the state
+// this is a callback so doesn't return anything
+const zoneStatusParser = (zone, data) => {
+  try {
+    // let x = Regexes.reZoneStatus.exec(data);
+    const x = [...data.trim().matchAll(Regexes.reZoneStatus)];
+    console.log("Parsing: ", data.trim(), x);
+
+    // return early if no groups
+    if (! x.length || x[0].groups === undefined) {
+      console.log("No groups found in data", data);
+      return;
+    }
+
+    // if a RESP group is matched...
+    if (x[0].groups.RESP !== undefined) {
+      console.log(JSON.stringify(x[0].groups));
+      if (x[0].groups.ZONE === zone.zone && x[0].groups.UNIT === zone.controller) {
+        console.log(x[0].groups)
+      }
+      for (const [k, v] of Object.entries(x[0].groups)) {
+        // ... update all state values
+        zone.state[k] = v;
+      }
+      console.log(`Zone ${zone.id} state: ${JSON.stringify(zone.state)}`);
+    }
+  } catch (e) {
+    console.log("Failed updating status for message ", data, e.message);
+  }
+}
+
 exports.Zone = class {
   constructor(controller, zone, port) {
     this.controller = controller;
@@ -172,22 +203,11 @@ exports.Zone = class {
     this.refreshState();
   }
 
-  // Parses a zone status reponse string and update the state
-  // this is a callback so doesn't return anything
-  zoneStatusParser(data) {
-    try {
-      const x = Regexes.reZoneStatus.exec(data.trim());
-      console.log("Parsing: ", data, x);
-      // if a RESP group is matched...
-      if (x.groups.RESP) {
-        for (const [k, v] of Object.entries(x.groups)) {
-          // ... update all state values
-          this.state[k] = v;
-          console.log(`Zone ${this.id} state: ${JSON.stringify(this.state)}`);
-        }
-      }
-    } catch (e) {
-      console.log("Failed updating status for message ", data, e.message);
+
+  setState(state) {
+    if (state.ZONE === this.ZONE) {
+      this.state = state;
+      console.log(this.state);
     }
   }
 
@@ -195,9 +215,10 @@ exports.Zone = class {
   async refreshState() {
     this.port.pipe(this.parser);
     this.parser.on("data", (data) => {
-      this.zoneStatusParser(data);
+      zoneStatusParser(this, data);
     });
     await this.port.write(`?${this.id}\r`);
+    //this.port.unpipe(this.parser);
     return this.state;
   } // end refreshState
 }; // end Zone
