@@ -43,8 +43,8 @@ exports.plugin = {
 
     // set up all the Zone objects according to config
     let zones = [];
-    for (let i in Config.config.controllers) {
-      for (let j in Config.config.controllers[i].zones) {
+    for (const i in Config.config.controllers) {
+      for (const j in Config.config.controllers[i].zones) {
         zones.push(
           new Zone.Zone(
             Config.config.controllers[i].controller,

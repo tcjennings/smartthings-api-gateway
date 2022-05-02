@@ -142,9 +142,8 @@ const remoteControlStatus = class {
 // this is a callback so doesn't return anything
 const zoneStatusParser = (zone, data) => {
   try {
-    // let x = Regexes.reZoneStatus.exec(data);
     const x = [...data.trim().matchAll(Regexes.reZoneStatus)];
-    console.log("Parsing: ", data.trim(), x);
+    console.log("Parsing: ", data.trim());
 
     // return early if no groups
     if (! x.length || x[0].groups === undefined) {
@@ -153,11 +152,7 @@ const zoneStatusParser = (zone, data) => {
     }
 
     // if a RESP group is matched...
-    if (x[0].groups.RESP !== undefined) {
-      console.log(JSON.stringify(x[0].groups));
-      if (x[0].groups.ZONE === zone.zone && x[0].groups.UNIT === zone.controller) {
-        console.log(x[0].groups)
-      }
+    if (x[0].groups.RESP !== undefined && x[0].groups.ZONE == zone.zone && x[0].groups.UNIT == zone.controller) {
       for (const [k, v] of Object.entries(x[0].groups)) {
         // ... update all state values
         zone.state[k] = v;
@@ -203,14 +198,7 @@ exports.Zone = class {
     this.refreshState();
   }
 
-
-  setState(state) {
-    if (state.ZONE === this.ZONE) {
-      this.state = state;
-      console.log(this.state);
-    }
-  }
-
+  // TODO separate from Zone class!
   // queries the serial port to refresh the state of the zone.
   async refreshState() {
     this.port.pipe(this.parser);
