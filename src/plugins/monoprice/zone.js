@@ -8,6 +8,7 @@
 // Additionally, a zone may support commands outside the scope of
 // any specific capability, such as STATUS
 const { ReadlineParser } = require("@serialport/parser-readline");
+const { date } = require("joi");
 
 const Regexes = require("./regexes");
 
@@ -21,13 +22,13 @@ const Switch = class {
   // implements the Switch.On command
   on() {
     console.log("Turning ON switch for Zone.");
-    this.zone.state.PR = 1;
+    this.zone.sendCommand("PR", "01");
     return this.zone.state;
   }
   // implements the Switch.Off command
   off() {
     console.log("Turning OFF switch for Zone.");
-    this.zone.state.PR = 0;
+    this.zone.sendCommand("PR", "00");
     return this.zone.state;
   }
 };
@@ -138,6 +139,30 @@ const remoteControlStatus = class {
   }
 };
 
+// Parses any serial command response
+const serialResponseParser = (zone, data) => {
+  try {
+    const x = [...data.trim().matchAll(Regexes.reCommandResponse)];
+    console.log("Parsing: ", data.trim());
+
+    // return early if no groups
+    if (! x.length || x[0].groups === undefined) {
+      console.log("No groups found in data", data);
+      return;
+    }
+
+    // if a RESP group is matched...
+    if (x[0].groups.RESP !== undefined && x[0].groups.ZONE == zone.zone && x[0].groups.UNIT == zone.controller) {
+      // ... update state values
+      const cmd = x[0].groups.CMD;
+      zone.state[cmd] = x[0].groups.VAL;
+      console.log(`Zone ${zone.id} ${cmd} state: ${zone.state[cmd]}`);
+    }
+  } catch (e) {
+    console.log("Failed running command ", data, e.message);
+  }
+}
+
 // Parses a zone status reponse string and update the state
 // this is a callback so doesn't return anything
 const zoneStatusParser = (zone, data) => {
@@ -195,18 +220,27 @@ exports.Zone = class {
       TR: new switchLevel(this, "TR"),
       BL: new switchLevel(this, "BL"),
     };
+    this.port.pipe(this.parser);
     this.refreshState();
   }
 
   // TODO separate from Zone class!
   // queries the serial port to refresh the state of the zone.
   async refreshState() {
-    this.port.pipe(this.parser);
     this.parser.on("data", (data) => {
       zoneStatusParser(this, data);
     });
     await this.port.write(`?${this.id}\r`);
-    //this.port.unpipe(this.parser);
+    this.parser.removeAllListeners();
     return this.state;
   } // end refreshState
+
+  async sendCommand(hw, val) {
+    this.parser.on("data", (data) => {
+      serialResponseParser(this, data);
+    });
+    await this.port.write(`<${this.id}${hw}${val}\r`)
+    this.parser.removeAllListeners();
+    return this.state;
+  }
 }; // end Zone
