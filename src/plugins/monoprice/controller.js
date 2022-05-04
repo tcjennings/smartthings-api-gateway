@@ -87,7 +87,10 @@ exports.SourceNameUpdateHandler = (request, h) => {
 };
 
 exports.CapabilityCallCommand = (request, h) => {
-  return {};
+  const zone = h.getZone(request.params.controller, request.params.zone);
+  const cmd = request.payload.command;
+  const hw = request.payload.hw;
+  return zone.capabilities[hw][cmd]();
 };
 
 exports.RefreshZoneCommand = (request, h) => {

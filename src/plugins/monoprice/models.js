@@ -95,3 +95,10 @@ exports.CapabilityCallCommandRequestModel = {
 exports.CapabilityCallCommandResponseModel = Joi.object().label(
   "CapabilityCallCommandResponse"
 );
+
+exports.CapabilityCallStatusRequestModel = {
+  params: Joi.object({
+    controller: Joi.string().required(),
+    zone: Joi.string().required(),
+  }).label("CapabilityCallCommandRequestParams")
+}

@@ -231,7 +231,6 @@ exports.Zone = class {
       zoneStatusParser(this, data);
     });
     await this.port.write(`?${this.id}\r`);
-    this.parser.removeAllListeners();
     return this.state;
   } // end refreshState
 
@@ -240,7 +239,6 @@ exports.Zone = class {
       serialResponseParser(this, data);
     });
     await this.port.write(`<${this.id}${hw}${val}\r`)
-    this.parser.removeAllListeners();
     return this.state;
   }
 }; // end Zone

@@ -132,7 +132,7 @@ exports.plugin = {
       options: {
         description: "Refresh and fetch state for a specific zone",
         tags: ["api"],
-        // validate: Models.CapabilityCallCommandRequestModel,
+        validate: Models.CapabilityCallStatusRequestModel,
         // response: { schema: Models.CapabilityCallCommandResponseModel },
       },
     });
