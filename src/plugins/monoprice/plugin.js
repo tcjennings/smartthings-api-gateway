@@ -150,6 +150,17 @@ exports.plugin = {
     });
 
     server.route({
+      method: "GET",
+      path: "/monoprice/controller/{controller}/zone/{zone}/capability/{capability}/attribute/{attribute}",
+      handler: Controller.CapabilityAttributeHandler,
+      options: {
+        description: "Get the value of an attribute for a capability",
+        tags: ["api"],
+        validate: Models.CapabilityAttributeRequestModel
+      }
+    });
+
+    server.route({
       method: "POST",
       path: "/monoprice/controller/{controller}/zone/{zone}",
       handler: Controller.CapabilityCallCommand,

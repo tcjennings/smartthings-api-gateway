@@ -19,16 +19,24 @@ const Switch = class {
     this.hw = hw;
   }
 
+  // attribute getter for switch
+  get switch() {
+    if (this.zone.state[this.hw] === "01" ) {
+      return "on"
+    } else {
+      return "off"
+    }
+  }
   // implements the Switch.On command
   on() {
     console.log("Turning ON switch for Zone.");
-    this.zone.sendCommand("PR", "01");
+    this.zone.sendCommand(this.hw, "01");
     return this.zone.state;
   }
   // implements the Switch.Off command
   off() {
     console.log("Turning OFF switch for Zone.");
-    this.zone.sendCommand("PR", "00");
+    this.zone.sendCommand(this.hw, "00");
     return this.zone.state;
   }
 };
@@ -52,22 +60,37 @@ const switchLevel = class {
 const audioMute = class {
   constructor(zone) {
     this.zone = zone;
+    this.hw = "MU";
   }
 
-  mute() {
+  get mute() {
+    if (this.zone.state["MU"] === "01" ) {
+      return "muted"
+    } else {
+      return "unmuted"
+    }
+  }
+
+  // command to set mute
+  set mute(value = null) {
     console.log("Muting Zone");
-    this.zone.state.MU = 1;
+    this.zone.sendCommand("MU", "01")
     return this.zone.state;
   }
 
+  // command to set unmute
   unmute() {
     console.log("Unmuting Zone");
-    this.zone.state.MU = 0;
+    this.zone.sendCommand("MU", "00")
     return this.zone.state;
   }
 
   setMute(state) {
-    this.zone.state.MU = state;
+    if (state === "muted") {
+      this.mute();
+    } else if (state === "unmuted") {
+      this.unmute();
+    }
     return this.zone.state;
   }
 };
@@ -180,6 +203,7 @@ const zoneStatusParser = (zone, data) => {
     if (x[0].groups.RESP !== undefined && x[0].groups.ZONE == zone.zone && x[0].groups.UNIT == zone.controller) {
       for (const [k, v] of Object.entries(x[0].groups)) {
         // ... update all state values
+        // TODO don't add RESP to state
         zone.state[k] = v;
       }
       console.log(`Zone ${zone.id} state: ${JSON.stringify(zone.state)}`);

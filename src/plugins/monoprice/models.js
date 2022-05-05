@@ -5,6 +5,11 @@ const requestID = Joi.string()
   .description("a request ID")
   .label("RequestId");
 
+const hardwareID = Joi.string()
+  .optional()
+  .description("an ID for a hardware component within a zone")
+  .label("HardwareId");
+
 const responseMetadata = Joi.object({
   id: Joi.string(),
 });
@@ -60,6 +65,19 @@ exports.CapabilityCommandRequestModel = {
   }),
   query: Joi.object({
     id: requestID,
+  }),
+};
+
+exports.CapabilityAttributeRequestModel = {
+  params: Joi.object({
+    controller: Joi.string().required(),
+    zone: Joi.string().required(),
+    capability: Joi.string().required(),
+    attribute: Joi.string().required(),
+  }),
+  query: Joi.object({
+    id: requestID,
+    hw: hardwareID
   }),
 };
 

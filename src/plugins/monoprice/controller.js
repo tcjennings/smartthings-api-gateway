@@ -97,3 +97,11 @@ exports.RefreshZoneCommand = (request, h) => {
   const zone = h.getZone(request.params.controller, request.params.zone);
   return zone.refreshState();
 }
+
+exports.CapabilityAttributeHandler = (request, h) => {
+  //return a state object for each hw in the zone that supplies
+  //the given capability, or if a hw is requested in the query
+  //return only that attribute
+  const zone = h.getZone(request.params.controller, request.params.zone);
+  return zone.capabilities[request.query.hw][request.params.attribute];
+}

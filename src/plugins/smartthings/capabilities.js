@@ -5,3 +5,8 @@ exports.capabilities = [
   "switch",
   "switchLevel",
 ];
+
+const switchAttributes = {
+  ON: "on",
+  OFF: "off"
+}
