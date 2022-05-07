@@ -8,7 +8,7 @@
 // Additionally, a zone may support commands outside the scope of
 // any specific capability, such as STATUS
 const { ReadlineParser } = require("@serialport/parser-readline");
-const { date } = require("joi");
+const { normalizeLevelConstraint } = require("./validate.js")
 
 const Regexes = require("./regexes");
 
@@ -42,19 +42,24 @@ const Switch = class {
 };
 
 const switchLevel = class {
-  constructor(zone, hw = null) {
+  constructor(zone, hw = null, constraints = {minimum:0, maximum:100}) {
     this.zone = zone;
     this.hw = hw;
-  }
-
-  setLevel(level, rate) {
-    return true;
+    this.constraints = constraints;
   }
 
   // attribute getter for current level
-  level() {
+  get level() {
     return true;
   }
+
+  setLevel(level, rate=1) {
+    // rate is ignored in this hardware
+    level = normalizeLevelConstraint(level, this.constraints);
+    this.zone.sendCommand(this.hw, `${x}`.padStart(2,0));
+    return this.zone.state;
+  }
+
 };
 
 const audioMute = class {
@@ -96,22 +101,36 @@ const audioMute = class {
 };
 
 const audioVolume = class {
-  constructor(zone) {
+  constructor(zone, constraints = {minimum:0, maximum:100}) {
     this.zone = zone;
+    this.constraints = constraints;
+    this.hw = "VO";
   }
 
+  // Increases volume by 1 up to the constraint max
   volumeUp() {
-    this.zone.state.VO += 1;
+    let level = parseInt(this.zone.state.VO);
+    if (level < this.constraints.maximum) {
+      level += 1;
+    }
+    this.zone.sendCommand(this.hw, `${level}`.padStart(2,0));
     return this.zone.state;
   }
 
+  // Decreases volume by 1 down to the constraint min
   volumeDown() {
-    this.zone.state.VO -= 0;
+    let level = parseInt(this.zone.state.VO);
+    if (level > this.constraints.minimum) {
+      level -= 1;
+    }
+    this.zone.sendCommand(this.hw, `${level}`.padStart(2,0));
     return this.zone.state;
   }
 
+  // Set the volume to a specified value, scaled to the constraint range
   setVolume(volume) {
-    this.zone.state.VO = volume;
+    volume = normalizeLevelConstraint(volume, this.constraints);
+    this.zone.sendCommand(this.hw, `${volume}`.padStart(2,0));
     return this.zone.state;
   }
 };
@@ -119,6 +138,8 @@ const audioVolume = class {
 const tvChannel = class {
   constructor(zone) {
     this.zone = zone;
+    this.hw = "CH";
+    this.constraints = {minimum:1, maximum:6};
   }
 
   // attribute getter for current channel
@@ -131,17 +152,35 @@ const tvChannel = class {
     return true;
   }
 
+  // Changes the source to the next higher value, wrapping at maximum
   channelUp() {
-    return true;
+    let channel = parseInt(this.zone.state.CH);
+    channel += 1
+    if (channel > this.constraints.maximum) {
+      channel = this.constraints.minimum;
+    }
+    this.zone.sendCommand(this.hw, `${channel}`.padStart(2,0));
+    return this.zone.state.CH;
   }
 
+  // Changes the source to the next lower value, wrapping at minimum
   channelDown() {
-    return true;
+    let channel = parseInt(this.zone.state.CH);
+    channel -= 1
+    if (channel < this.constraints.minimum) {
+      channel = this.constraints.maximum;
+    }
+    this.zone.sendCommand(this.hw, `${channel}`.padStart(2,0));
+    return this.zone.state.CH;
   }
 
   // sets the active channel to arg
   setTvChannel(tvChannel) {
-    return true;
+    if (tvChannel > this.constraints.maximum || tvChannel < this.constraints.minimum) {
+      return this.zone.state.CH;
+    }
+    this.zone.sendCommand(this.hw, `${tvChannel}`.padStart(2,0));
+    return this.zone.state.CH;
   }
 
   // sets the tv channel name, but since it only takes 1 argument
@@ -154,6 +193,7 @@ const tvChannel = class {
 const remoteControlStatus = class {
   constuctor(zone) {
     this.zone = zone;
+    this.hw = "LS";
   }
 
   // returns true if a keypad is connected (LS)
@@ -203,7 +243,10 @@ const zoneStatusParser = (zone, data) => {
     if (x[0].groups.RESP !== undefined && x[0].groups.ZONE == zone.zone && x[0].groups.UNIT == zone.controller) {
       for (const [k, v] of Object.entries(x[0].groups)) {
         // ... update all state values
-        // TODO don't add RESP to state
+        if (k === "RESP") {
+          // Do not add the RESP group to the state object
+          continue;
+        }
         zone.state[k] = v;
       }
       console.log(`Zone ${zone.id} state: ${JSON.stringify(zone.state)}`);
@@ -236,13 +279,13 @@ exports.Zone = class {
     this.capabilities = {
       PR: new Switch(this, "PR"),
       MU: new audioMute(this),
-      VO: new audioVolume(this),
+      VO: new audioVolume(this, {minimum:0, maximum:38, median:19}),
       CH: new tvChannel(this),
       LS: new remoteControlStatus(this),
       DT: new Switch(this, "DT"),
-      BS: new switchLevel(this, "BS"),
-      TR: new switchLevel(this, "TR"),
-      BL: new switchLevel(this, "BL"),
+      BS: new switchLevel(this, "BS", {minimum:-10, maximum:10, median:0}),
+      TR: new switchLevel(this, "TR", {minimum:-10, maximum:10, median:0}),
+      BL: new switchLevel(this, "BL", {minimum:0, maximum:20, median:10}),
     };
     this.port.pipe(this.parser);
     this.refreshState();
@@ -263,6 +306,14 @@ exports.Zone = class {
       serialResponseParser(this, data);
     });
     await this.port.write(`<${this.id}${hw}${val}\r`)
+    return this.state;
+  }
+
+  async sendQuery(hw) {
+    this.parser.on("data", (data) => {
+      serialResponseParser(this, data);
+    });
+    await this.port.write(`?${this.id}${hw}\r`)
     return this.state;
   }
 }; // end Zone

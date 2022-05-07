@@ -13,7 +13,11 @@ const normalizeBetweenTwoRanges = (val, minVal, maxVal, newMin, newMax) => {
   return newMin + ((val - minVal) * (newMax - newMin)) / (maxVal - minVal);
 };
 
-const CapabilityCommand = (request, h) => {};
+const normalizeLevelConstraint = (level, constraint) => {
+  // constraint is an object with minimum, maximum, and median values
+  // level is a value to be normalized
+  return parseInt(normalizeBetweenTwoRanges(level, 0, 100, constraint.minimum, constraint.maximum))
+}
 
 const NormalizeVolumeLevel = (level) => {
   // audioVolumeLevel will be set between [0,100]
@@ -54,7 +58,4 @@ const NormalizeEQLevel = (level) => {
   return parseInt(normalizeBetweenTwoRanges(level, 0, 100, 0, 14));
 };
 
-exports.NormalizeEQLevel = NormalizeEQLevel;
-exports.NormalizeBalanceLevel = NormalizeBalanceLevel;
-exports.NormalizeVolumeLevel = NormalizeVolumeLevel;
-exports.CapabilityCommand = CapabilityCommand;
+exports.normalizeLevelConstraint = normalizeLevelConstraint;
