@@ -12,6 +12,13 @@ exports.deployment = async ({ start, config } = {}) => {
     host: "0.0.0.0",
   });
 
+  await server.register({
+    plugin: require("hapi-pino"),
+    options: {
+      level: process.env.NODE_ENV == "production" ? "error" : "info",
+      redact: ["req.headers.authorization"],
+    },
+  });
   await server.register(Swagger);
   await server.register(SmartThings);
 
@@ -20,7 +27,7 @@ exports.deployment = async ({ start, config } = {}) => {
 
   if (start) {
     server.start();
-    console.log("Server running on %s", server.info.uri);
+    server.logger.info("Server running on %s", server.info.uri);
     return server;
   }
 

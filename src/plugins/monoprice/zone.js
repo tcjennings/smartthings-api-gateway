@@ -8,8 +8,9 @@
 // Additionally, a zone may support commands outside the scope of
 // any specific capability, such as STATUS
 const { ReadlineParser } = require("@serialport/parser-readline");
-const { normalizeLevelConstraint } = require("./validate.js")
+const { normalizeLevelConstraint } = require("./validate.js");
 
+const logger = require("pino")()
 const Regexes = require("./regexes");
 
 const Switch = class {
@@ -21,28 +22,28 @@ const Switch = class {
 
   // attribute getter for switch
   get switch() {
-    if (this.zone.state[this.hw] === "01" ) {
-      return "on"
+    if (this.zone.state[this.hw] === "01") {
+      return "on";
     } else {
-      return "off"
+      return "off";
     }
   }
   // implements the Switch.On command
   on() {
-    console.log("Turning ON switch for Zone.");
+    logger.info("Turning ON switch for Zone.");
     this.zone.sendCommand(this.hw, "01");
     return this.zone.state;
   }
   // implements the Switch.Off command
   off() {
-    console.log("Turning OFF switch for Zone.");
+    logger.info("Turning OFF switch for Zone.");
     this.zone.sendCommand(this.hw, "00");
     return this.zone.state;
   }
 };
 
 const switchLevel = class {
-  constructor(zone, hw = null, constraints = {minimum:0, maximum:100}) {
+  constructor(zone, hw = null, constraints = { minimum: 0, maximum: 100 }) {
     this.zone = zone;
     this.hw = hw;
     this.constraints = constraints;
@@ -53,13 +54,12 @@ const switchLevel = class {
     return true;
   }
 
-  setLevel(level, rate=1) {
+  setLevel(level, rate = 1) {
     // rate is ignored in this hardware
     level = normalizeLevelConstraint(level, this.constraints);
-    this.zone.sendCommand(this.hw, `${x}`.padStart(2,0));
+    this.zone.sendCommand(this.hw, `${x}`.padStart(2, 0));
     return this.zone.state;
   }
-
 };
 
 const audioMute = class {
@@ -69,24 +69,24 @@ const audioMute = class {
   }
 
   get mute() {
-    if (this.zone.state["MU"] === "01" ) {
-      return "muted"
+    if (this.zone.state["MU"] === "01") {
+      return "muted";
     } else {
-      return "unmuted"
+      return "unmuted";
     }
   }
 
   // command to set mute
   set mute(value = null) {
-    console.log("Muting Zone");
-    this.zone.sendCommand("MU", "01")
+    logger.info("Muting Zone");
+    this.zone.sendCommand("MU", "01");
     return this.zone.state;
   }
 
   // command to set unmute
   unmute() {
-    console.log("Unmuting Zone");
-    this.zone.sendCommand("MU", "00")
+    logger.info("Unmuting Zone");
+    this.zone.sendCommand("MU", "00");
     return this.zone.state;
   }
 
@@ -101,7 +101,7 @@ const audioMute = class {
 };
 
 const audioVolume = class {
-  constructor(zone, constraints = {minimum:0, maximum:100}) {
+  constructor(zone, constraints = { minimum: 0, maximum: 100 }) {
     this.zone = zone;
     this.constraints = constraints;
     this.hw = "VO";
@@ -113,7 +113,7 @@ const audioVolume = class {
     if (level < this.constraints.maximum) {
       level += 1;
     }
-    this.zone.sendCommand(this.hw, `${level}`.padStart(2,0));
+    this.zone.sendCommand(this.hw, `${level}`.padStart(2, 0));
     return this.zone.state;
   }
 
@@ -123,14 +123,14 @@ const audioVolume = class {
     if (level > this.constraints.minimum) {
       level -= 1;
     }
-    this.zone.sendCommand(this.hw, `${level}`.padStart(2,0));
+    this.zone.sendCommand(this.hw, `${level}`.padStart(2, 0));
     return this.zone.state;
   }
 
   // Set the volume to a specified value, scaled to the constraint range
   setVolume(volume) {
     volume = normalizeLevelConstraint(volume, this.constraints);
-    this.zone.sendCommand(this.hw, `${volume}`.padStart(2,0));
+    this.zone.sendCommand(this.hw, `${volume}`.padStart(2, 0));
     return this.zone.state;
   }
 };
@@ -139,7 +139,7 @@ const tvChannel = class {
   constructor(zone) {
     this.zone = zone;
     this.hw = "CH";
-    this.constraints = {minimum:1, maximum:6};
+    this.constraints = { minimum: 1, maximum: 6 };
   }
 
   // attribute getter for current channel
@@ -155,31 +155,34 @@ const tvChannel = class {
   // Changes the source to the next higher value, wrapping at maximum
   channelUp() {
     let channel = parseInt(this.zone.state.CH);
-    channel += 1
+    channel += 1;
     if (channel > this.constraints.maximum) {
       channel = this.constraints.minimum;
     }
-    this.zone.sendCommand(this.hw, `${channel}`.padStart(2,0));
+    this.zone.sendCommand(this.hw, `${channel}`.padStart(2, 0));
     return this.zone.state.CH;
   }
 
   // Changes the source to the next lower value, wrapping at minimum
   channelDown() {
     let channel = parseInt(this.zone.state.CH);
-    channel -= 1
+    channel -= 1;
     if (channel < this.constraints.minimum) {
       channel = this.constraints.maximum;
     }
-    this.zone.sendCommand(this.hw, `${channel}`.padStart(2,0));
+    this.zone.sendCommand(this.hw, `${channel}`.padStart(2, 0));
     return this.zone.state.CH;
   }
 
   // sets the active channel to arg
   setTvChannel(tvChannel) {
-    if (tvChannel > this.constraints.maximum || tvChannel < this.constraints.minimum) {
+    if (
+      tvChannel > this.constraints.maximum ||
+      tvChannel < this.constraints.minimum
+    ) {
       return this.zone.state.CH;
     }
-    this.zone.sendCommand(this.hw, `${tvChannel}`.padStart(2,0));
+    this.zone.sendCommand(this.hw, `${tvChannel}`.padStart(2, 0));
     return this.zone.state.CH;
   }
 
@@ -206,41 +209,49 @@ const remoteControlStatus = class {
 const serialResponseParser = (zone, data) => {
   try {
     const x = [...data.trim().matchAll(Regexes.reCommandResponse)];
-    console.log("Parsing: ", data.trim());
+    logger.info("Parsing: %s", data.trim());
 
     // return early if no groups
-    if (! x.length || x[0].groups === undefined) {
-      console.log("No groups found in data", data);
+    if (!x.length || x[0].groups === undefined) {
+      logger.warning("No groups found in data %s", data);
       return;
     }
 
     // if a RESP group is matched...
-    if (x[0].groups.RESP !== undefined && x[0].groups.ZONE == zone.zone && x[0].groups.UNIT == zone.controller) {
+    if (
+      x[0].groups.RESP !== undefined &&
+      x[0].groups.ZONE == zone.zone &&
+      x[0].groups.UNIT == zone.controller
+    ) {
       // ... update state values
       const cmd = x[0].groups.CMD;
       zone.state[cmd] = x[0].groups.VAL;
-      console.log(`Zone ${zone.id} ${cmd} state: ${zone.state[cmd]}`);
+      logger.info(`Zone ${zone.id} ${cmd} state: ${zone.state[cmd]}`);
     }
   } catch (e) {
-    console.log("Failed running command ", data, e.message);
+    logger.error("Failed running command %s: %s", data, e.message);
   }
-}
+};
 
 // Parses a zone status reponse string and update the state
 // this is a callback so doesn't return anything
 const zoneStatusParser = (zone, data) => {
   try {
     const x = [...data.trim().matchAll(Regexes.reZoneStatus)];
-    console.log("Parsing: ", data.trim());
+    logger.info("Parsing: %s", data.trim());
 
     // return early if no groups
-    if (! x.length || x[0].groups === undefined) {
-      console.log("No groups found in data", data);
+    if (!x.length || x[0].groups === undefined) {
+      logger.warning("No groups found in data %s", data);
       return;
     }
 
     // if a RESP group is matched...
-    if (x[0].groups.RESP !== undefined && x[0].groups.ZONE == zone.zone && x[0].groups.UNIT == zone.controller) {
+    if (
+      x[0].groups.RESP !== undefined &&
+      x[0].groups.ZONE == zone.zone &&
+      x[0].groups.UNIT == zone.controller
+    ) {
       for (const [k, v] of Object.entries(x[0].groups)) {
         // ... update all state values
         if (k === "RESP") {
@@ -249,12 +260,12 @@ const zoneStatusParser = (zone, data) => {
         }
         zone.state[k] = v;
       }
-      console.log(`Zone ${zone.id} state: ${JSON.stringify(zone.state)}`);
+      logger.info(`Zone ${zone.id} state: ${JSON.stringify(zone.state)}`);
     }
   } catch (e) {
-    console.log("Failed updating status for message ", data, e.message);
+    logger.error("Failed updating status for message %s: %s", data, e.message);
   }
-}
+};
 
 exports.Zone = class {
   constructor(controller, zone, port) {
@@ -279,13 +290,13 @@ exports.Zone = class {
     this.capabilities = {
       PR: new Switch(this, "PR"),
       MU: new audioMute(this),
-      VO: new audioVolume(this, {minimum:0, maximum:38, median:19}),
+      VO: new audioVolume(this, { minimum: 0, maximum: 38, median: 19 }),
       CH: new tvChannel(this),
       LS: new remoteControlStatus(this),
       DT: new Switch(this, "DT"),
-      BS: new switchLevel(this, "BS", {minimum:-10, maximum:10, median:0}),
-      TR: new switchLevel(this, "TR", {minimum:-10, maximum:10, median:0}),
-      BL: new switchLevel(this, "BL", {minimum:0, maximum:20, median:10}),
+      BS: new switchLevel(this, "BS", { minimum: -10, maximum: 10, median: 0 }),
+      TR: new switchLevel(this, "TR", { minimum: -10, maximum: 10, median: 0 }),
+      BL: new switchLevel(this, "BL", { minimum: 0, maximum: 20, median: 10 }),
     };
     this.port.pipe(this.parser);
     this.refreshState();
@@ -305,7 +316,7 @@ exports.Zone = class {
     this.parser.on("data", (data) => {
       serialResponseParser(this, data);
     });
-    await this.port.write(`<${this.id}${hw}${val}\r`)
+    await this.port.write(`<${this.id}${hw}${val}\r`);
     return this.state;
   }
 
@@ -313,7 +324,7 @@ exports.Zone = class {
     this.parser.on("data", (data) => {
       serialResponseParser(this, data);
     });
-    await this.port.write(`?${this.id}${hw}\r`)
+    await this.port.write(`?${this.id}${hw}\r`);
     return this.state;
   }
 }; // end Zone

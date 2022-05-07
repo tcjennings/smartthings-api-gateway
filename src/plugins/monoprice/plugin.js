@@ -35,7 +35,7 @@ exports.plugin = {
   pkg: Package,
   register: async function (server, options) {
     Config.set_config(options);
-    console.log(Config);
+    server.logger.info(Config);
 
     // create an instance of the serial port
     // TODO serialport management should be a plugin that decorates the server
@@ -54,7 +54,6 @@ exports.plugin = {
         );
       }
     }
-    //console.log(zones)
 
     // Plugin Methods
     const getZone = (controller, zone) => {
@@ -156,8 +155,8 @@ exports.plugin = {
       options: {
         description: "Get the value of an attribute for a capability",
         tags: ["api"],
-        validate: Models.CapabilityAttributeRequestModel
-      }
+        validate: Models.CapabilityAttributeRequestModel,
+      },
     });
 
     server.route({

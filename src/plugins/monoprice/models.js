@@ -77,7 +77,7 @@ exports.CapabilityAttributeRequestModel = {
   }),
   query: Joi.object({
     id: requestID,
-    hw: hardwareID
+    hw: hardwareID,
   }),
 };
 
@@ -118,5 +118,5 @@ exports.CapabilityCallStatusRequestModel = {
   params: Joi.object({
     controller: Joi.string().required(),
     zone: Joi.string().required(),
-  }).label("CapabilityCallCommandRequestParams")
-}
+  }).label("CapabilityCallCommandRequestParams"),
+};

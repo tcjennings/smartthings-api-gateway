@@ -8,5 +8,5 @@ exports.capabilities = [
 
 const switchAttributes = {
   ON: "on",
-  OFF: "off"
-}
+  OFF: "off",
+};

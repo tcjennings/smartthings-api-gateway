@@ -16,8 +16,16 @@ const normalizeBetweenTwoRanges = (val, minVal, maxVal, newMin, newMax) => {
 const normalizeLevelConstraint = (level, constraint) => {
   // constraint is an object with minimum, maximum, and median values
   // level is a value to be normalized
-  return parseInt(normalizeBetweenTwoRanges(level, 0, 100, constraint.minimum, constraint.maximum))
-}
+  return parseInt(
+    normalizeBetweenTwoRanges(
+      level,
+      0,
+      100,
+      constraint.minimum,
+      constraint.maximum
+    )
+  );
+};
 
 const NormalizeVolumeLevel = (level) => {
   // audioVolumeLevel will be set between [0,100]
