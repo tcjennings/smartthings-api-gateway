@@ -1,5 +1,11 @@
 "use strict";
 
+/**
+ * The Monoprice Plugin Module
+ *
+ * @module monoprice
+ */
+
 const { SerialPort } = require("serialport");
 
 const Config = require("./config");

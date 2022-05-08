@@ -1,17 +1,19 @@
 /**
  * Capabilities module for the Monoprice plugin.
- * 
+ *
  * Each SmartThings Capability implemented by the device is represented
  * as a class. Each class implements the attributes and methods defined
  * for that Capability.
- * 
+ *
  * Each class constructor associates a capability with a Zone and optionally
  * a Hardware within that zone. Each class also implements a property to
  * indicate whether the capability is Production, Proposed, or Custom, and
  * the version of the Capability it implements.
- * 
+ *
  * @module monoprice/capabilities
  */
+const { normalizeLevelConstraint } = require("./utility");
+
 exports.Switch = class {
   // Constructor binds an instance of the Switch to a Zone
   constructor(zone, hw = null) {
@@ -19,8 +21,8 @@ exports.Switch = class {
     this.hw = hw;
     this.capability = {
       version: 1,
-      status: "live"
-    }
+      status: "live",
+    };
   }
 
   // attribute getter for switch
@@ -43,7 +45,7 @@ exports.Switch = class {
     this.zone.sendCommand(this.hw, "00");
     return this.zone.state;
   }
-}
+};
 
 exports.switchLevel = class {
   constructor(zone, hw = null, constraints = { minimum: 0, maximum: 100 }) {
@@ -52,8 +54,8 @@ exports.switchLevel = class {
     this.constraints = constraints;
     this.capability = {
       version: 1,
-      status: "live"
-    }
+      status: "live",
+    };
   }
 
   // attribute getter for current level
@@ -75,8 +77,8 @@ exports.audioMute = class {
     this.hw = "MU";
     this.capability = {
       version: 1,
-      status: "live"
-    }
+      status: "live",
+    };
   }
 
   get mute() {
@@ -118,8 +120,8 @@ exports.audioVolume = class {
     this.hw = "VO";
     this.capability = {
       version: 1,
-      status: "live"
-    }
+      status: "live",
+    };
   }
 
   // Increases volume by 1 up to the constraint max
@@ -157,8 +159,8 @@ exports.tvChannel = class {
     this.constraints = { minimum: 1, maximum: 6 };
     this.capability = {
       version: 1,
-      status: "proposed"
-    }
+      status: "proposed",
+    };
   }
 
   // attribute getter for current channel
@@ -218,8 +220,8 @@ exports.remoteControlStatus = class {
     this.hw = "LS";
     this.capability = {
       version: 1,
-      status: "live"
-    }
+      status: "live",
+    };
   }
 
   // returns true if a keypad is connected (LS)

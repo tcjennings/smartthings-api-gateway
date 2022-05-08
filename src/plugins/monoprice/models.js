@@ -1,3 +1,9 @@
+/**
+ * Models module for the Monoprice plugin. Defines Joi schemas for API requests and responses.
+ *
+ * @module monoprice/models
+ */
+
 const Joi = require("joi");
 
 const requestID = Joi.string()

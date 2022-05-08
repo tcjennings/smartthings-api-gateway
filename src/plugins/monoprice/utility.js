@@ -1,6 +1,13 @@
 /**
+ * Utility module for monoprice plugin
+ *
+ * @module monoprice/utility
+ */
+
+/**
  * Normalizes a value from one range (current) to another (new).
  *
+ * @private
  * @param  { Number } val    //the current value (part of the current range).
  * @param  { Number } minVal //the min value of the current value range.
  * @param  { Number } maxVal //the max value of the current value range.
@@ -13,9 +20,16 @@ const normalizeBetweenTwoRanges = (val, minVal, maxVal, newMin, newMax) => {
   return newMin + ((val - minVal) * (newMax - newMin)) / (maxVal - minVal);
 };
 
-const normalizeLevelConstraint = (level, constraint) => {
-  // constraint is an object with minimum, maximum, and median values
-  // level is a value to be normalized
+/**
+ * Normalizes a level value according to the specified constraint. The value
+ * is provided on a 0..100 scale and normalized to the scale represented by
+ * the minimum/maximum provided in the constraint.
+ * @param {number} level - The level value to normalize
+ * @param {Object} constraint - The constraints for the value, containing at least minimum and maximum
+ *
+ * @returns {number} - The normalized value.
+ */
+exports.normalizeLevelConstraint = (level, constraint) => {
   return parseInt(
     normalizeBetweenTwoRanges(
       level,
@@ -26,44 +40,3 @@ const normalizeLevelConstraint = (level, constraint) => {
     )
   );
 };
-
-const NormalizeVolumeLevel = (level) => {
-  // audioVolumeLevel will be set between [0,100]
-  // The amp wants a level between [0,38]
-  // Make sure the level is within the acceptable input range
-  if (level < 0) {
-    level = 0;
-  }
-  if (level > 100) {
-    level = 100;
-  }
-  return parseInt(normalizeBetweenTwoRanges(level, 0, 100, 0, 38));
-};
-
-const NormalizeBalanceLevel = (level) => {
-  // switchLevel will be set between [0,100]
-  // The amp wants a level between [0,20]
-  // Make sure the level is within the acceptable input range
-  if (level < 0) {
-    level = 0;
-  }
-  if (level > 100) {
-    level = 100;
-  }
-  return parseInt(normalizeBetweenTwoRanges(level, 0, 100, 0, 20));
-};
-
-const NormalizeEQLevel = (level) => {
-  // switchLevel will be set between [0,100]
-  // The amp wants a level between [0,14]
-  // Make sure the level is within the acceptable input range
-  if (level < 0) {
-    level = 0;
-  }
-  if (level > 100) {
-    level = 100;
-  }
-  return parseInt(normalizeBetweenTwoRanges(level, 0, 100, 0, 14));
-};
-
-exports.normalizeLevelConstraint = normalizeLevelConstraint;

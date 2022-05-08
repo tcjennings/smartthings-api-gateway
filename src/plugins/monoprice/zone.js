@@ -11,7 +11,6 @@ const { ReadlineParser } = require("@serialport/parser-readline");
 const logger = require("pino")();
 
 const Capabilities = require("./capabilities");
-const { normalizeLevelConstraint } = require("./utility");
 const Regexes = require("./regexes");
 
 // Parses any serial command response
@@ -75,7 +74,19 @@ const zoneStatusParser = (zone, data) => {
   }
 };
 
+/** Class representing a Zone. */
 exports.Zone = class {
+  /**
+   * Create and manage a Zone
+   * @param {number} controller - The controller number in a stack to which this zone belongs.
+   * @param {number} zone - The zone number within a controller which this zone represents.
+   * @param {Object} port - A Serialport object used to communicate with the controller.
+   *
+   * @property {string} id - The qualified ID of the Zone, by concatenating the controller and zone IDs.
+   * @property {Object} parser - A serial port parser for parsing serial command results.
+   * @property {Object} state - The current value associated with each hardware component in the Zone.
+   * @property {Object} capabilities - An instance of a Capability class representing each hardware component in the Zone.
+   */
   constructor(controller, zone, port) {
     this.controller = controller;
     this.zone = zone;
@@ -126,8 +137,10 @@ exports.Zone = class {
     this.refreshState();
   }
 
-  // TODO separate from Zone class!
-  // queries the serial port to refresh the state of the zone.
+  /**
+   * Refreshes a Zone state by querying the controller.
+   * @returns {Object} - the updated state object for the zone.
+   */
   async refreshState() {
     this.parser.on("data", (data) => {
       zoneStatusParser(this, data);
@@ -136,6 +149,12 @@ exports.Zone = class {
     return this.state;
   } // end refreshState
 
+  /**
+   * Sends a serial command to set a value in the controller and updates the zone state.
+   * @param {string} hw - The name of the hardware component within the zone to target.
+   * @param {number} val - The value to which the hardware component should be set.
+   * @returns {Object} - The updated state object for the zone.
+   */
   async sendCommand(hw, val) {
     this.parser.on("data", (data) => {
       serialResponseParser(this, data);
@@ -144,6 +163,11 @@ exports.Zone = class {
     return this.state;
   }
 
+  /**
+   * Sends a serial command to query the state of the hardware component and updates the zone state.
+   * @param {string} hw - The name of the hardware component within the zone to target.
+   * @returns
+   */
   async sendQuery(hw) {
     this.parser.on("data", (data) => {
       serialResponseParser(this, data);

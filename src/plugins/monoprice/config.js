@@ -1,3 +1,9 @@
+/**
+ * Config module for the Monoprice plugin
+ *
+ * @module monoprice/config
+ */
+
 class Config {
   constructor() {
     this.config = {};

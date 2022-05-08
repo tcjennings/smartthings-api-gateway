@@ -1,3 +1,9 @@
+/**
+ * Controller module for the Monoprice plugin. Contains handler functions for API routes.
+ *
+ * @module monoprice/controller
+ */
+
 const Config = require("./config");
 
 /**
