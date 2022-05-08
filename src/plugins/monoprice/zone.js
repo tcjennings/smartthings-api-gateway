@@ -10,7 +10,7 @@
 const { ReadlineParser } = require("@serialport/parser-readline");
 const { normalizeLevelConstraint } = require("./validate.js");
 
-const logger = require("pino")()
+const logger = require("pino")();
 const Regexes = require("./regexes");
 
 const Switch = class {

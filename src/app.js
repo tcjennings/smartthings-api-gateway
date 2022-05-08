@@ -12,6 +12,7 @@ exports.deployment = async ({ start, config } = {}) => {
     host: "0.0.0.0",
   });
 
+  // Pino Logging plugin
   await server.register({
     plugin: require("hapi-pino"),
     options: {
@@ -23,7 +24,10 @@ exports.deployment = async ({ start, config } = {}) => {
   await server.register(SmartThings);
 
   // loop through configured plugins to load them?
-  await server.register({ plugin: Monoprice, options: config.monoprice || {} });
+  await server.register(
+    { plugin: Monoprice, options: config.monoprice || {} },
+    config.monoprice.options
+  );
 
   if (start) {
     server.start();

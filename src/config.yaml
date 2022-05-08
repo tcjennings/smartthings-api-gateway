@@ -3,6 +3,9 @@ smartthings:
   plugins:
     - monoprice
 monoprice:
+  options:
+    routes:
+      prefix: /monoprice
   sources:
     - source_1_name
     - source_2_name

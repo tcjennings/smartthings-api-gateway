@@ -69,7 +69,7 @@ exports.plugin = {
     // Plugin Routes
     server.route({
       method: "GET",
-      path: "/monoprice/sources",
+      path: "/sources",
       handler: Controller.SourceNamesDiscoveryHandler,
       options: {
         description: "Get a list of source channels",
@@ -81,7 +81,7 @@ exports.plugin = {
 
     server.route({
       method: "GET",
-      path: "/monoprice/zones",
+      path: "/zones",
       handler: Controller.ZoneDiscoveryHandler,
       options: {
         description: "Get a list of zones",
@@ -93,7 +93,7 @@ exports.plugin = {
 
     server.route({
       method: "GET",
-      path: "/monoprice/controller/{controller}/zone/{zone}/name",
+      path: "/controller/{controller}/zone/{zone}/name",
       handler: Controller.ZoneNameDiscoveryHandler,
       options: {
         description: "Get the name of a specific zone",
@@ -105,7 +105,7 @@ exports.plugin = {
 
     server.route({
       method: "GET",
-      path: "/monoprice/source/{source}/name",
+      path: "/source/{source}/name",
       handler: Controller.SourceNameDiscoveryHandler,
       options: {
         description: "Get the name of a specific source channel",
@@ -116,7 +116,7 @@ exports.plugin = {
 
     server.route({
       method: "PATCH",
-      path: "/monoprice/source/{source}/name",
+      path: "/source/{source}/name",
       handler: Controller.SourceNameUpdateHandler,
       options: {
         description: "Update the name of a specific source channel",
@@ -126,7 +126,7 @@ exports.plugin = {
 
     server.route({
       method: "GET",
-      path: "/monoprice/controller/{controller}/zone/{zone}",
+      path: "/controller/{controller}/zone/{zone}",
       handler: Controller.RefreshZoneCommand,
       options: {
         description: "Refresh and fetch state for a specific zone",
@@ -138,7 +138,7 @@ exports.plugin = {
 
     server.route({
       method: "GET",
-      path: "/monoprice/controller/{controller}/zone/{zone}/capability/{capability}",
+      path: "/controller/{controller}/zone/{zone}/capability/{capability}",
       handler: Controller.CapabilityCommand,
       options: {
         description: "Get the status for a capability at a specific zone",
@@ -150,7 +150,7 @@ exports.plugin = {
 
     server.route({
       method: "GET",
-      path: "/monoprice/controller/{controller}/zone/{zone}/capability/{capability}/attribute/{attribute}",
+      path: "/controller/{controller}/zone/{zone}/capability/{capability}/attribute/{attribute}",
       handler: Controller.CapabilityAttributeHandler,
       options: {
         description: "Get the value of an attribute for a capability",
@@ -161,7 +161,7 @@ exports.plugin = {
 
     server.route({
       method: "POST",
-      path: "/monoprice/controller/{controller}/zone/{zone}",
+      path: "/controller/{controller}/zone/{zone}",
       handler: Controller.CapabilityCallCommand,
       options: {
         description: "Call a command for a capability at a specific zone",
