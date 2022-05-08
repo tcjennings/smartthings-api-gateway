@@ -1,8 +1,26 @@
+/**
+ * Capabilities module for the Monoprice plugin.
+ * 
+ * Each SmartThings Capability implemented by the device is represented
+ * as a class. Each class implements the attributes and methods defined
+ * for that Capability.
+ * 
+ * Each class constructor associates a capability with a Zone and optionally
+ * a Hardware within that zone. Each class also implements a property to
+ * indicate whether the capability is Production, Proposed, or Custom, and
+ * the version of the Capability it implements.
+ * 
+ * @module monoprice/capabilities
+ */
 exports.Switch = class {
   // Constructor binds an instance of the Switch to a Zone
   constructor(zone, hw = null) {
     this.zone = zone;
     this.hw = hw;
+    this.capability = {
+      version: 1,
+      status: "live"
+    }
   }
 
   // attribute getter for switch
@@ -32,6 +50,10 @@ exports.switchLevel = class {
     this.zone = zone;
     this.hw = hw;
     this.constraints = constraints;
+    this.capability = {
+      version: 1,
+      status: "live"
+    }
   }
 
   // attribute getter for current level
@@ -51,6 +73,10 @@ exports.audioMute = class {
   constructor(zone) {
     this.zone = zone;
     this.hw = "MU";
+    this.capability = {
+      version: 1,
+      status: "live"
+    }
   }
 
   get mute() {
@@ -90,6 +116,10 @@ exports.audioVolume = class {
     this.zone = zone;
     this.constraints = constraints;
     this.hw = "VO";
+    this.capability = {
+      version: 1,
+      status: "live"
+    }
   }
 
   // Increases volume by 1 up to the constraint max
@@ -125,6 +155,10 @@ exports.tvChannel = class {
     this.zone = zone;
     this.hw = "CH";
     this.constraints = { minimum: 1, maximum: 6 };
+    this.capability = {
+      version: 1,
+      status: "proposed"
+    }
   }
 
   // attribute getter for current channel
@@ -182,6 +216,10 @@ exports.remoteControlStatus = class {
   constuctor(zone) {
     this.zone = zone;
     this.hw = "LS";
+    this.capability = {
+      version: 1,
+      status: "live"
+    }
   }
 
   // returns true if a keypad is connected (LS)
