@@ -1,15 +1,12 @@
 "use strict";
 
-const Joi = require("joi");
 const { SerialPort } = require("serialport");
 
-const Commands = require("./commands");
 const Config = require("./config");
 const Controller = require("./controller");
 const Models = require("./models.js");
-const Validate = require("./validate");
-const Zone = require("./zone");
 const Package = require("./package.json");
+const Zone = require("./zone");
 
 function getPort() {
   try {
@@ -31,6 +28,22 @@ function getPort() {
   }
 }
 
+function createZones(controllers, port) {
+  const zones = [];
+  for (const i in controllers) {
+    for (const j in controllers[i].zones) {
+      zones.push(
+        new Zone.Zone(
+          controllers[i].controller,
+          controllers[i].zones[j].zone,
+          port
+        )
+      );
+    }
+  }
+  return zones;
+}
+
 exports.plugin = {
   pkg: Package,
   register: async function (server, options) {
@@ -42,18 +55,7 @@ exports.plugin = {
     const port = await getPort();
 
     // set up all the Zone objects according to config
-    let zones = [];
-    for (const i in Config.config.controllers) {
-      for (const j in Config.config.controllers[i].zones) {
-        zones.push(
-          new Zone.Zone(
-            Config.config.controllers[i].controller,
-            Config.config.controllers[i].zones[j].zone,
-            port
-          )
-        );
-      }
-    }
+    const zones = createZones(Config.config.controllers, port);
 
     // Plugin Methods
     const getZone = (controller, zone) => {
