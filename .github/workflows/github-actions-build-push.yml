@@ -1,11 +1,12 @@
 name: GitHub Actions Build-Push Image
 on:
   push:
-    branches:
-      - main
+    branches: ["*"]
+
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
+
 jobs:
   build:
     runs-on: ubuntu-latest
