@@ -1,14 +1,20 @@
 "use strict";
 
-const Config = require("./config");
+import {LoadConfig, Configuration} from "./config";
+
 const Hapi = require("@hapi/hapi");
 const Monoprice = require("./plugins/monoprice");
 const SmartThings = require("./plugins/smartthings");
 const Swagger = require("./plugins/swagger");
 
-exports.deployment = async ({ start, config } = {}) => {
+interface DeploymentParameters {
+  start: boolean;
+  config: Configuration;
+};
+
+exports.deployment = async ({ start, config }:DeploymentParameters) => {
   const server = Hapi.server({
-    port: parseInt(config.smartthings.port),
+    port: parseInt(config.smartthings.port!) || 3000,
     host: "0.0.0.0",
   });
 
@@ -26,7 +32,7 @@ exports.deployment = async ({ start, config } = {}) => {
   // loop through configured plugins to load them?
   await server.register(
     { plugin: Monoprice, options: config.monoprice || {} },
-    config.monoprice.options
+    config.monoprice!.options || {}
   );
 
   if (start) {
@@ -41,7 +47,7 @@ exports.deployment = async ({ start, config } = {}) => {
 };
 
 if (require.main === module) {
-  const config = Config.LoadConfigs();
+  const config = LoadConfig();
 
   exports.deployment({ start: true, config: config });
 

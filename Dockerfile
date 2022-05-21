@@ -10,6 +10,6 @@ COPY package*.json ./
 
 RUN npm install
 
-COPY src .
+COPY dist .
 
 CMD ["node", "app.js"]
