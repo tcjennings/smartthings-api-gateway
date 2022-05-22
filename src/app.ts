@@ -1,8 +1,9 @@
 "use strict";
 
-import {LoadConfig, Configuration} from "./config";
+import { LoadConfig, Configuration } from "./config";
 
-const Hapi = require("@hapi/hapi");
+import Hapi from "@hapi/hapi";
+import Pino from "hapi-pino";
 const Monoprice = require("./plugins/monoprice");
 const SmartThings = require("./plugins/smartthings");
 const Swagger = require("./plugins/swagger");
@@ -10,9 +11,9 @@ const Swagger = require("./plugins/swagger");
 interface DeploymentParameters {
   start: boolean;
   config: Configuration;
-};
+}
 
-exports.deployment = async ({ start, config }:DeploymentParameters) => {
+exports.deployment = async ({ start, config }: DeploymentParameters) => {
   const server = Hapi.server({
     port: parseInt(config.smartthings.port!) || 3000,
     host: "0.0.0.0",
@@ -20,7 +21,7 @@ exports.deployment = async ({ start, config }:DeploymentParameters) => {
 
   // Pino Logging plugin
   await server.register({
-    plugin: require("hapi-pino"),
+    plugin: Pino,
     options: {
       level: process.env.NODE_ENV == "production" ? "error" : "info",
       redact: ["req.headers.authorization"],

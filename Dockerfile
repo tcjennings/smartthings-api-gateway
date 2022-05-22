@@ -6,7 +6,7 @@ ENV NODE_ENV production
 
 WORKDIR /opt/app
 
-COPY package*.json ./
+COPY package*.json config.yaml ./
 
 RUN npm install
 

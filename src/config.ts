@@ -15,16 +15,16 @@ export interface Configuration {
   smartthings: {
     port?: string;
     plugins: string[];
-  },
+  };
   monoprice?: {
-    options? : {
+    options?: {
       routes: {
-        prefix: string
-      }
-    },
+        prefix: string;
+      };
+    };
     sources: string[];
     controllers: MonopriceController[];
-  }
+  };
 }
 
 export const LoadConfig = () => {
@@ -35,7 +35,7 @@ export const LoadConfig = () => {
     },
   };
   try {
-    config = yaml.load(fs.readFileSync("config.yaml", "utf8")) as Configuration;
+    config = yaml.load(fs.readFileSync("../config.yaml", "utf8")) as Configuration;
   } catch (e) {
     console.log(e);
   }

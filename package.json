@@ -4,10 +4,10 @@
   "description": "An API gateway API server for SmartThings commands.",
   "main": "app.js",
   "scripts": {
-    "dev:serve": "cd src && nodemon -e js -w . ./app.js",
+    "dev:serve": "cd dist && nodemon -e js -w . ./app.js",
     "dev:lint": "npx prettier --write src/",
     "test": "jest",
-    "build": "rm -f ./dist && npx tsc"
+    "build": "rm -rf ./dist && npx tsc"
   },
   "repository": {
     "type": "git",
@@ -32,6 +32,9 @@
   },
   "devDependencies": {
     "@tsconfig/node16": "^1.0.2",
+    "@types/hapi": "^18.0.7",
+    "@types/hapi__inert": "^5.2.3",
+    "@types/hapi__vision": "^5.5.3",
     "@types/js-yaml": "^4.0.5",
     "eslint": "^8.12.0",
     "eslint-config-google": "^0.14.0",
