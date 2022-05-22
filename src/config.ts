@@ -35,7 +35,9 @@ export const LoadConfig = () => {
     },
   };
   try {
-    config = yaml.load(fs.readFileSync("../config.yaml", "utf8")) as Configuration;
+    config = yaml.load(
+      fs.readFileSync("../config.yaml", "utf8")
+    ) as Configuration;
   } catch (e) {
     console.log(e);
   }

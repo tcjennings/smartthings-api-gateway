@@ -2,5 +2,5 @@
   "name": "smarttthings",
   "version": "0.1.0",
   "description": "Hapi plugin for core smartthings functionality",
-  "main": "smartthings.js"
+  "main": "plugin.js"
 }

@@ -5,8 +5,8 @@ import { LoadConfig, Configuration } from "./config";
 import Hapi from "@hapi/hapi";
 import Pino from "hapi-pino";
 const Monoprice = require("./plugins/monoprice");
-const SmartThings = require("./plugins/smartthings");
-const Swagger = require("./plugins/swagger");
+import SmartThings from "./plugins/smartthings";
+import Swagger from "./plugins/swagger";
 
 interface DeploymentParameters {
   start: boolean;

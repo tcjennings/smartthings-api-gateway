@@ -1,14 +1,14 @@
-"use script";
+"use strict";
 
-import Hapi from "@hapi/hapi";
+import type Hapi from "@hapi/hapi";
 import Inert from "@hapi/inert";
 import Vision from "@hapi/vision";
 import HapiSwagger from "hapi-swagger";
 
 import Package from "./package.json";
 
-module.exports = {
-  name: Package.name,
+const Plugin = {
+  pkg: Package,
   async register(server: Hapi.Server) {
     await server.register([Inert, Vision]);
 
@@ -23,3 +23,5 @@ module.exports = {
     });
   },
 };
+
+export default Plugin;

@@ -1,4 +1,4 @@
-exports.capabilities = [
+export const Capabilities = [
   "audioMute",
   "audioNotification",
   "audioVolume",
