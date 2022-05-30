@@ -1,33 +1,17 @@
 import fs from "fs";
 import yaml from "js-yaml";
 
-interface MonopriceZone {
-  zone: number;
-  name: string;
-}
-
-interface MonopriceController {
-  controller: number | string;
-  zones: MonopriceZone[];
-}
+import { MonopriceConfiguration } from "./plugins/monoprice/types";
 
 export interface Configuration {
   smartthings: {
     port?: string;
     plugins: string[];
   };
-  monoprice?: {
-    options?: {
-      routes: {
-        prefix: string;
-      };
-    };
-    sources: string[];
-    controllers: MonopriceController[];
-  };
+  monoprice?: MonopriceConfiguration;
 }
 
-export const LoadConfig = () => {
+export const loadConfig = () => {
   // default config, empty set of plugins
   let config: Configuration = {
     smartthings: {

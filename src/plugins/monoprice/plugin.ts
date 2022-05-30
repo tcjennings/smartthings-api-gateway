@@ -6,19 +6,22 @@
  * @module monoprice
  */
 
-const { SerialPort } = require("serialport");
+import type Hapi from "@hapi/hapi";
+import type { MonopriceConfiguration, MonopriceController } from "./types";
 
-const Config = require("./config");
-const Controller = require("./controller");
-const Models = require("./models.js");
-const Package = require("./package.json");
-const Zone = require("./zone");
+import { SerialPort } from "serialport";
+
+import { Configuration } from "./config";
+import * as Controller from "./controller";
+import * as Models from "./models";
+import Package from "./package.json";
+import { Zone } from "./zone";
 
 function getPort() {
   try {
     const port = new SerialPort({
-      path: Config.config.serial.device,
-      baudRate: Config.config.serial.speed,
+      path: Configuration.config.serial.device,
+      baudRate: Configuration.config.serial.speed,
       autoOpen: false,
       lock: false,
     });
@@ -34,15 +37,18 @@ function getPort() {
   }
 }
 
-function createZones(controllers, port) {
+function createZones(
+  controllers: MonopriceController[],
+  port: SerialPort | unknown
+) {
   const zones = [];
   for (const i in controllers) {
     for (const j in controllers[i].zones) {
       zones.push(
-        new Zone.Zone(
+        new Zone(
           controllers[i].controller,
           controllers[i].zones[j].zone,
-          port
+          port as SerialPort
         )
       );
     }
@@ -50,23 +56,26 @@ function createZones(controllers, port) {
   return zones;
 }
 
-exports.plugin = {
+export const Plugin = {
   pkg: Package,
-  register: async function (server, options) {
-    Config.set_config(options);
-    server.logger.info(Config);
+  register: async function (
+    server: Hapi.Server,
+    options: MonopriceConfiguration
+  ) {
+    Configuration.set_config(options);
+    server.logger.info(Configuration);
 
     // create an instance of the serial port
     // TODO serialport management should be a plugin that decorates the server
-    const port = await getPort();
+    const port = getPort();
 
     // set up all the Zone objects according to config
-    const zones = createZones(Config.config.controllers, port);
+    const zones = createZones(Configuration.config.controllers, port);
 
     // Plugin Methods
-    const getZone = (controller, zone) => {
+    const getZone = (controller: number | string, zone: number | string) => {
       const zoneId = `${controller}${zone}`;
-      for (let z in zones) {
+      for (const z in zones) {
         if (zones[z].id === zoneId) {
           return zones[z];
         }

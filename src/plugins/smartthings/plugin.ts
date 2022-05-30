@@ -6,12 +6,13 @@ import { Capabilities } from "./capabilities";
 import { DefaultRequestModel, CapabilitiesResponseModel } from "./models";
 import Package from "./package.json";
 
-const Plugin = {
+export const Plugin = {
   pkg: Package,
   register: async function (server: Hapi.Server) {
     server.route({
       method: "GET",
       path: "/capabilities",
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       handler: function (request, h) {
         return {
           capabilities: Capabilities,
@@ -28,5 +29,3 @@ const Plugin = {
     });
   },
 };
-
-export default Plugin;

@@ -1,12 +1,12 @@
 "use strict";
 
-import { LoadConfig, Configuration } from "./config";
+import { loadConfig, Configuration } from "./config";
 
 import Hapi from "@hapi/hapi";
 import Pino from "hapi-pino";
-const Monoprice = require("./plugins/monoprice");
-import SmartThings from "./plugins/smartthings";
-import Swagger from "./plugins/swagger";
+import { Plugin as Monoprice } from "./plugins/monoprice";
+import { Plugin as SmartThings } from "./plugins/smartthings";
+import { Plugin as Swagger } from "./plugins/swagger";
 
 interface DeploymentParameters {
   start: boolean;
@@ -15,10 +15,11 @@ interface DeploymentParameters {
 
 exports.deployment = async ({ start, config }: DeploymentParameters) => {
   const server = Hapi.server({
-    port: parseInt(config.smartthings.port!) || 3000,
+    port: Number(config.smartthings.port) || 3000,
     host: "0.0.0.0",
   });
 
+  // TODO use glue to manage plugins
   // Pino Logging plugin
   await server.register({
     plugin: Pino,
@@ -30,10 +31,14 @@ exports.deployment = async ({ start, config }: DeploymentParameters) => {
   await server.register(Swagger);
   await server.register(SmartThings);
 
-  // loop through configured plugins to load them?
   await server.register(
-    { plugin: Monoprice, options: config.monoprice || {} },
-    config.monoprice!.options || {}
+    {
+      plugin: Monoprice,
+      options: config.monoprice,
+    },
+    config.monoprice
+      ? config.monoprice.options
+      : { routes: { prefix: "/monoprice" } }
   );
 
   if (start) {
@@ -48,7 +53,7 @@ exports.deployment = async ({ start, config }: DeploymentParameters) => {
 };
 
 if (require.main === module) {
-  const config = LoadConfig();
+  const config = loadConfig();
 
   exports.deployment({ start: true, config: config });
 

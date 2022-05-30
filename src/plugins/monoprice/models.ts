@@ -4,7 +4,7 @@
  * @module monoprice/models
  */
 
-const Joi = require("joi");
+import Joi from "joi";
 
 const requestID = Joi.string()
   .optional()
@@ -20,20 +20,20 @@ const responseMetadata = Joi.object({
   id: Joi.string(),
 });
 
-const DefaultRequestModel = {
+export const DefaultRequestModel = {
   query: Joi.object({
     id: requestID,
   }).label("DefaultRequestQuery"),
 };
 
-exports.ZoneDiscoveryResponseModel = Joi.object({
+export const ZoneDiscoveryResponseModel = Joi.object({
   zones: Joi.array().items(Joi.string()).length(6),
   metadata: Joi.object({
     controllers: Joi.array().min(1).max(3).items(Joi.string()),
   }),
 }).label("ZoneDiscoveryResponse");
 
-exports.ZoneNameDiscoveryRequestModel = {
+export const ZoneNameDiscoveryRequestModel = {
   params: Joi.object({
     controller: Joi.string().required(),
     zone: Joi.string().required(),
@@ -43,27 +43,27 @@ exports.ZoneNameDiscoveryRequestModel = {
   }),
 };
 
-exports.ZoneNameDiscoveryResponseModel = Joi.object({
+export const ZoneNameDiscoveryResponseModel = Joi.object({
   controller: Joi.string(),
   zone: Joi.string(),
   name: Joi.string(),
   metadata: responseMetadata,
 }).label("ZoneNameDiscoveryResponse");
 
-exports.SourceNamesDiscoveryResponseModel = Joi.object({
+export const SourceNamesDiscoveryResponseModel = Joi.object({
   sources: Joi.array()
     .items(Joi.object({ id: Joi.number(), name: Joi.string() }))
     .length(6),
   metadata: responseMetadata,
 }).label("SourceNamesDiscoveryResponse");
 
-exports.SourceNameDiscoveryResponseModel = Joi.object({
+export const SourceNameDiscoveryResponseModel = Joi.object({
   source: Joi.string(),
   name: Joi.string(),
   metadata: responseMetadata,
 }).label("SourceNameDisocveryResponse");
 
-exports.CapabilityCommandRequestModel = {
+export const CapabilityCommandRequestModel = {
   params: Joi.object({
     controller: Joi.string().required(),
     zone: Joi.string().required(),
@@ -74,7 +74,7 @@ exports.CapabilityCommandRequestModel = {
   }),
 };
 
-exports.CapabilityAttributeRequestModel = {
+export const CapabilityAttributeRequestModel = {
   params: Joi.object({
     controller: Joi.string().required(),
     zone: Joi.string().required(),
@@ -87,7 +87,7 @@ exports.CapabilityAttributeRequestModel = {
   }),
 };
 
-exports.CapabilityCommandResponseModel = Joi.object({
+export const CapabilityCommandResponseModel = Joi.object({
   capability: Joi.string(),
   attributes: Joi.object(),
   metadata: Joi.object({
@@ -97,7 +97,7 @@ exports.CapabilityCommandResponseModel = Joi.object({
   }).label("ResponseMetadata"),
 }).label("CapabilityCommandResponse");
 
-exports.CapabilityCallCommandRequestModel = {
+export const CapabilityCallCommandRequestModel = {
   params: Joi.object({
     controller: Joi.string().required(),
     zone: Joi.string().required(),
@@ -116,11 +116,11 @@ exports.CapabilityCallCommandRequestModel = {
   }).label("CapabilityCallCommandRequestPayload"),
 };
 
-exports.CapabilityCallCommandResponseModel = Joi.object().label(
+export const CapabilityCallCommandResponseModel = Joi.object().label(
   "CapabilityCallCommandResponse"
 );
 
-exports.CapabilityCallStatusRequestModel = {
+export const CapabilityCallStatusRequestModel = {
   params: Joi.object({
     controller: Joi.string().required(),
     zone: Joi.string().required(),

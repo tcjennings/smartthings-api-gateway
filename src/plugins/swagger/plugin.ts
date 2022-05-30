@@ -7,7 +7,7 @@ import HapiSwagger from "hapi-swagger";
 
 import Package from "./package.json";
 
-const Plugin = {
+export const Plugin = {
   pkg: Package,
   async register(server: Hapi.Server) {
     await server.register([Inert, Vision]);
@@ -23,5 +23,3 @@ const Plugin = {
     });
   },
 };
-
-export default Plugin;

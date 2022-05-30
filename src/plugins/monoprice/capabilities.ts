@@ -12,13 +12,20 @@
  *
  * @module monoprice/capabilities
  */
-const { normalizeLevelConstraint } = require("./utility");
+import { Zone } from "./zone";
+import { normalizeLevelConstraint } from "./utility";
+import Pino from "pino";
 
-exports.Switch = class {
+const logger = Pino(); // eslint-disable-line new-cap
+
+export const Switch = class {
+  zone: Zone;
+  hw: string;
+  capability: { [key: string]: unknown };
   // Constructor binds an instance of the Switch to a Zone
-  constructor(zone, hw = null) {
+  constructor(zone: Zone, hw: string | undefined = undefined) {
     this.zone = zone;
-    this.hw = hw;
+    this.hw = String(hw);
     this.capability = {
       version: 1,
       status: "live",
@@ -27,7 +34,7 @@ exports.Switch = class {
 
   // attribute getter for switch
   get switch() {
-    if (this.zone.state[this.hw] === "01") {
+    if (this.zone.state[this.hw as string] === "01") {
       return "on";
     } else {
       return "off";
@@ -47,10 +54,18 @@ exports.Switch = class {
   }
 };
 
-exports.switchLevel = class {
-  constructor(zone, hw = null, constraints = { minimum: 0, maximum: 100 }) {
+export const switchLevel = class {
+  zone: Zone;
+  hw: string;
+  constraints: { [key: string]: number };
+  capability: { [key: string]: string | number };
+  constructor(
+    zone: Zone,
+    hw: string | unknown = null,
+    constraints: { [key: string]: number } = { minimum: 0, maximum: 100 }
+  ) {
     this.zone = zone;
-    this.hw = hw;
+    this.hw = String(hw);
     this.constraints = constraints;
     this.capability = {
       version: 1,
@@ -63,16 +78,20 @@ exports.switchLevel = class {
     return true;
   }
 
-  setLevel(level, rate = 1) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  setLevel(level: number, rate = 1) {
     // rate is ignored in this hardware
     level = normalizeLevelConstraint(level, this.constraints);
-    this.zone.sendCommand(this.hw, `${x}`.padStart(2, 0));
+    this.zone.sendCommand(this.hw, `${level}`.padStart(2, "0"));
     return this.zone.state;
   }
 };
 
-exports.audioMute = class {
-  constructor(zone) {
+export const audioMute = class {
+  zone: Zone;
+  hw: string;
+  capability: { [key: string]: string | number };
+  constructor(zone: Zone) {
     this.zone = zone;
     this.hw = "MU";
     this.capability = {
@@ -81,6 +100,7 @@ exports.audioMute = class {
     };
   }
 
+  // command to get mute status
   get mute() {
     if (this.zone.state["MU"] === "01") {
       return "muted";
@@ -90,22 +110,22 @@ exports.audioMute = class {
   }
 
   // command to set mute
-  set mute(value = null) {
+  set mute(value: string) {
     logger.info("Muting Zone");
     this.zone.sendCommand("MU", "01");
-    return this.zone.state;
   }
 
   // command to set unmute
   unmute() {
     logger.info("Unmuting Zone");
+    this.mute = "unmuted";
     this.zone.sendCommand("MU", "00");
     return this.zone.state;
   }
 
-  setMute(state) {
+  setMute(state: string) {
     if (state === "muted") {
-      this.mute();
+      this.mute = "muted";
     } else if (state === "unmuted") {
       this.unmute();
     }
@@ -113,8 +133,15 @@ exports.audioMute = class {
   }
 };
 
-exports.audioVolume = class {
-  constructor(zone, constraints = { minimum: 0, maximum: 100 }) {
+export const audioVolume = class {
+  zone: Zone;
+  hw: string;
+  constraints: { [key: string]: number };
+  capability: { [key: string]: number | string };
+  constructor(
+    zone: Zone,
+    constraints = { minimum: 0, maximum: 100, median: 50 }
+  ) {
     this.zone = zone;
     this.constraints = constraints;
     this.hw = "VO";
@@ -126,34 +153,40 @@ exports.audioVolume = class {
 
   // Increases volume by 1 up to the constraint max
   volumeUp() {
-    let level = parseInt(this.zone.state.VO);
+    let level = Number(this.zone.state.VO);
+    Math.floor(level);
     if (level < this.constraints.maximum) {
       level += 1;
     }
-    this.zone.sendCommand(this.hw, `${level}`.padStart(2, 0));
+    this.zone.sendCommand(this.hw, `${level}`.padStart(2, "0"));
     return this.zone.state;
   }
 
   // Decreases volume by 1 down to the constraint min
   volumeDown() {
-    let level = parseInt(this.zone.state.VO);
+    let level = Number(this.zone.state.VO);
+    Math.floor(level);
     if (level > this.constraints.minimum) {
       level -= 1;
     }
-    this.zone.sendCommand(this.hw, `${level}`.padStart(2, 0));
+    this.zone.sendCommand(this.hw, `${level}`.padStart(2, "0"));
     return this.zone.state;
   }
 
   // Set the volume to a specified value, scaled to the constraint range
-  setVolume(volume) {
+  setVolume(volume: number) {
     volume = normalizeLevelConstraint(volume, this.constraints);
-    this.zone.sendCommand(this.hw, `${volume}`.padStart(2, 0));
+    this.zone.sendCommand(this.hw, `${volume}`.padStart(2, "0"));
     return this.zone.state;
   }
 };
 
-exports.tvChannel = class {
-  constructor(zone) {
+export const tvChannel = class {
+  zone: Zone;
+  hw: string;
+  constraints: { [key: string]: number };
+  capability: { [key: string]: number | string };
+  constructor(zone: Zone) {
     this.zone = zone;
     this.hw = "CH";
     this.constraints = { minimum: 1, maximum: 6 };
@@ -175,47 +208,53 @@ exports.tvChannel = class {
 
   // Changes the source to the next higher value, wrapping at maximum
   channelUp() {
-    let channel = parseInt(this.zone.state.CH);
+    let channel = Number(this.zone.state.CH);
+    Math.floor(channel);
     channel += 1;
     if (channel > this.constraints.maximum) {
       channel = this.constraints.minimum;
     }
-    this.zone.sendCommand(this.hw, `${channel}`.padStart(2, 0));
+    this.zone.sendCommand(this.hw, `${channel}`.padStart(2, "0"));
     return this.zone.state.CH;
   }
 
   // Changes the source to the next lower value, wrapping at minimum
   channelDown() {
-    let channel = parseInt(this.zone.state.CH);
+    let channel = Number(this.zone.state.CH);
+    Math.floor(channel);
     channel -= 1;
     if (channel < this.constraints.minimum) {
       channel = this.constraints.maximum;
     }
-    this.zone.sendCommand(this.hw, `${channel}`.padStart(2, 0));
+    this.zone.sendCommand(this.hw, `${channel}`.padStart(2, "0"));
     return this.zone.state.CH;
   }
 
   // sets the active channel to arg
-  setTvChannel(tvChannel) {
+  setTvChannel(tvChannel: number) {
     if (
       tvChannel > this.constraints.maximum ||
       tvChannel < this.constraints.minimum
     ) {
       return this.zone.state.CH;
     }
-    this.zone.sendCommand(this.hw, `${tvChannel}`.padStart(2, 0));
+    this.zone.sendCommand(this.hw, `${tvChannel}`.padStart(2, "0"));
     return this.zone.state.CH;
   }
 
   // sets the tv channel name, but since it only takes 1 argument
   // it must operate on the *current* tvChannel
-  setTvChannelName(tvChannelName) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  setTvChannelName(tvChannelName: string) {
     return true;
   }
 };
 
-exports.remoteControlStatus = class {
-  constuctor(zone) {
+export const remoteControlStatus = class {
+  zone: Zone;
+  hw: string;
+  capability: { [key: string]: string | number };
+  constructor(zone: Zone) {
     this.zone = zone;
     this.hw = "LS";
     this.capability = {

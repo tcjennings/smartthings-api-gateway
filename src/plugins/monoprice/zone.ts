@@ -1,3 +1,9 @@
+/* eslint-disable new-cap */
+/* The constructors in this module follow the naming conventions
+ * established by the SmartThings capabilities reference. Therefore
+ * the `eslint new-cap` rule is disabled for this module.
+ */
+
 // Implements a class representing a Zone in a monoprice amp
 // a system may have up to 18 zones, 6 on each of as many as
 // 3 units in a stack.
@@ -7,57 +13,61 @@
 
 // Additionally, a zone may support commands outside the scope of
 // any specific capability, such as STATUS
-const { ReadlineParser } = require("@serialport/parser-readline");
-const logger = require("pino")();
+import { ReadlineParser } from "@serialport/parser-readline";
+import Pino from "pino";
+import { SerialPort } from "serialport";
 
-const Capabilities = require("./capabilities");
-const Regexes = require("./regexes");
+import { MonopriceZoneState } from "./types";
+import * as Capabilities from "./capabilities";
+import * as Regexes from "./regexes";
+
+const logger = Pino(); // eslint-disable-line new-cap
 
 // Parses any serial command response
-const serialResponseParser = (zone, data) => {
+const serialResponseParser = (zone: Zone, data: string) => {
   try {
     const x = [...data.trim().matchAll(Regexes.reCommandResponse)];
     logger.info("Parsing: %s", data.trim());
 
     // return early if no groups
     if (!x.length || x[0].groups === undefined) {
-      logger.warning("No groups found in data %s", data);
+      logger.warn("No groups found in data %s", data);
       return;
     }
 
     // if a RESP group is matched...
     if (
       x[0].groups.RESP !== undefined &&
-      x[0].groups.ZONE == zone.zone &&
-      x[0].groups.UNIT == zone.controller
+      x[0].groups.ZONE === String(zone.zone) &&
+      x[0].groups.UNIT === String(zone.controller)
     ) {
       // ... update state values
       const cmd = x[0].groups.CMD;
       zone.state[cmd] = x[0].groups.VAL;
       logger.info(`Zone ${zone.id} ${cmd} state: ${zone.state[cmd]}`);
     }
-  } catch (e) {
-    logger.error("Failed running command %s: %s", data, e.message);
+  } catch (e: unknown) {
+    logger.error("Failed running command %s: %s", data, (e as Error).message);
   }
 };
 
 // Parses a zone status reponse string and update the state
-const zoneStatusParser = (zone, data) => {
+const zoneStatusParser = (zone: Zone, data: string) => {
   try {
     const x = [...data.trim().matchAll(Regexes.reZoneStatus)];
     logger.info("Parsing: %s", data.trim());
 
     // return early if no groups
     if (!x.length || x[0].groups === undefined) {
-      logger.warning("No groups found in data %s", data);
+      logger.warn("No groups found in data %s", data);
       return;
     }
 
     // if a RESP group is matched...
     if (
       x[0].groups.RESP !== undefined &&
-      x[0].groups.ZONE == zone.zone &&
-      x[0].groups.UNIT == zone.controller
+      x[0].groups.ZONE === String(zone.zone) &&
+      x[0].groups.UNIT === String(zone.controller)
     ) {
       for (const [k, v] of Object.entries(x[0].groups)) {
         // ... update all state values
@@ -70,12 +80,16 @@ const zoneStatusParser = (zone, data) => {
       logger.info(`Zone ${zone.id} state: ${JSON.stringify(zone.state)}`);
     }
   } catch (e) {
-    logger.error("Failed updating status for message %s: %s", data, e.message);
+    logger.error(
+      "Failed updating status for message %s: %s",
+      data,
+      (e as Error).message
+    );
   }
 };
 
 /** Class representing a Zone. */
-exports.Zone = class {
+export class Zone {
   /**
    * Create and manage a Zone
    * @param {number} controller - The controller number in a stack to which this zone belongs.
@@ -87,24 +101,31 @@ exports.Zone = class {
    * @property {Object} state - The current value associated with each hardware component in the Zone.
    * @property {Object} capabilities - An instance of a Capability class representing each hardware component in the Zone.
    */
-  constructor(controller, zone, port) {
+  controller: number;
+  zone: number;
+  port: SerialPort;
+  id: string;
+  parser: ReadlineParser;
+  state: MonopriceZoneState;
+  capabilities: unknown;
+  constructor(controller: number, zone: number, port: SerialPort) {
     this.controller = controller;
     this.zone = zone;
     this.id = `${controller}${zone}`;
     this.port = port;
     this.parser = new ReadlineParser();
     this.state = {
-      UNIT: null,
-      ZONE: null,
-      PR: null,
-      CH: null,
-      VO: null,
-      BS: null,
-      TR: null,
-      BL: null,
-      DT: null,
-      MU: null,
-      LS: null,
+      UNIT: undefined,
+      ZONE: undefined,
+      PR: undefined,
+      CH: undefined,
+      VO: undefined,
+      BS: undefined,
+      TR: undefined,
+      BL: undefined,
+      DT: undefined,
+      MU: undefined,
+      LS: undefined,
     };
     this.capabilities = {
       PR: new Capabilities.Switch(this, "PR"),
@@ -139,7 +160,7 @@ exports.Zone = class {
 
   /**
    * Refreshes a Zone state by querying the controller.
-   * @returns {Object} - the updated state object for the zone.
+   * @return {Object} - the updated state object for the zone.
    */
   async refreshState() {
     this.parser.on("data", (data) => {
@@ -153,9 +174,9 @@ exports.Zone = class {
    * Sends a serial command to set a value in the controller and updates the zone state.
    * @param {string} hw - The name of the hardware component within the zone to target.
    * @param {number} val - The value to which the hardware component should be set.
-   * @returns {Object} - The updated state object for the zone.
+   * @return {Object} - The updated state object for the zone.
    */
-  async sendCommand(hw, val) {
+  async sendCommand(hw: string, val: number | string) {
     this.parser.on("data", (data) => {
       serialResponseParser(this, data);
     });
@@ -166,13 +187,13 @@ exports.Zone = class {
   /**
    * Sends a serial command to query the state of the hardware component and updates the zone state.
    * @param {string} hw - The name of the hardware component within the zone to target.
-   * @returns
+   * @return {Object}
    */
-  async sendQuery(hw) {
+  async sendQuery(hw: string) {
     this.parser.on("data", (data) => {
       serialResponseParser(this, data);
     });
     await this.port.write(`?${this.id}${hw}\r`);
     return this.state;
   }
-}; // end Zone
+} // end Zone

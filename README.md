@@ -13,6 +13,7 @@ A plugin should also include a discovery endpoint.
 
 ## Stack
 
+- typescript
 - node
 - hapi
   - joi

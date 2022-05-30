@@ -5,8 +5,3 @@ export const Capabilities = [
   "switch",
   "switchLevel",
 ];
-
-const switchAttributes = {
-  ON: "on",
-  OFF: "off",
-};

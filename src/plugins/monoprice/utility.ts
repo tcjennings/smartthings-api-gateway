@@ -14,9 +14,15 @@
  * @param  { Number } newMin //the min value of the new value range.
  * @param  { Number } newMax //the max value of the new value range.
  *
- * @returns { Number } the normalized value.
+ * @return { Number } the normalized value.
  */
-const normalizeBetweenTwoRanges = (val, minVal, maxVal, newMin, newMax) => {
+const normalizeBetweenTwoRanges = (
+  val: number,
+  minVal: number,
+  maxVal: number,
+  newMin: number,
+  newMax: number
+) => {
   return newMin + ((val - minVal) * (newMax - newMin)) / (maxVal - minVal);
 };
 
@@ -27,10 +33,13 @@ const normalizeBetweenTwoRanges = (val, minVal, maxVal, newMin, newMax) => {
  * @param {number} level - The level value to normalize
  * @param {Object} constraint - The constraints for the value, containing at least minimum and maximum
  *
- * @returns {number} - The normalized value.
+ * @return {number} - The normalized value.
  */
-exports.normalizeLevelConstraint = (level, constraint) => {
-  return parseInt(
+export const normalizeLevelConstraint = (
+  level: number,
+  constraint: { [key: string]: number }
+) => {
+  return Number(
     normalizeBetweenTwoRanges(
       level,
       0,

@@ -1,13 +1,15 @@
-env:
-  browser: true
-  commonjs: true
-  es2021: true
+root: true
+parser: "@typescript-eslint/parser"
+plugins:
+  - "@typescript-eslint"
+  - prettier
 extends:
   - google
   - plugin:prettier/recommended
-plugins:
-  - prettier
-parserOptions:
-  ecmaVersion: latest
+  - "eslint:recommended"
+  - "plugin:@typescript-eslint/recommended"
 rules:
   prettier/prettier: error
+  valid-jsdoc: warn
+  require-jsdoc: warn
+  new-cap: warn
